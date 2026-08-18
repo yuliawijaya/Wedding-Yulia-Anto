@@ -1,205 +1,130 @@
-const SPREADSHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
-const PASSCODE = "123456"; // Ganti password admin Anda di sini
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Pernikahan Rama & Nadia — Pendakian Gunung Prau 2.565 MDPL</title>
+    <meta name="description" content="Website Undangan Pernikahan 3D Interaktif Bertema Pendakian Gunung Prau Menuju Puncak Cinta." />
+    <meta property="og:title" content="Pernikahan Rama & Nadia — Gunung Prau 3D" />
+    <meta property="og:description" content="Ikuti perjalanan cinta kami mendaki Gunung Prau menuju puncak pelaminan." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏔️</text></svg>" />
 
-function doGet(e) {
-  const action = e.parameter.action;
-  const guestId = e.parameter.guestId;
-  
-  if (action === "getGuest") {
-    return jsonResponse(getGuestData(guestId));
-  } else if (action === "getWishes") {
-    return jsonResponse(getWishesData());
-  } else if (action === "getAdminData") {
-    const pass = e.parameter.passcode;
-    if (pass !== PASSCODE) return jsonResponse({ error: "Unauthorized" });
-    return jsonResponse(getAdminDashboardData());
-  }
-  return jsonResponse({ status: "active" });
-}
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
 
-function doPost(e) {
-  try {
-    const contents = JSON.parse(e.postData.contents);
-    const action = contents.action;
+    <!-- Tailwind CSS CDN (untuk kemudahan deployment standalone GitHub Pages) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              serif: ['Cinzel', 'serif', 'Georgia'],
+              sans: ['Plus Jakarta Sans', 'sans-serif']
+            }
+          }
+        }
+      }
+    </script>
 
-    if (action === "submitRSVP") {
-      return jsonResponse(saveRSVP(contents.data));
-    } else if (action === "submitWish") {
-      return jsonResponse(saveWish(contents.data));
-    } else if (action === "adminUpdateGuest") {
-      if (contents.passcode !== PASSCODE) return jsonResponse({ error: "Unauthorized" });
-      return jsonResponse(adminUpdateGuest(contents.data));
-    } else if (action === "adminAddGuest") {
-      if (contents.passcode !== PASSCODE) return jsonResponse({ error: "Unauthorized" });
-      return jsonResponse(adminAddGuest(contents.data));
-    }
-  } catch (err) {
-    return jsonResponse({ error: err.toString() });
-  }
-}
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="./css/style.css" />
 
-function jsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+    <!-- Three.js & Canvas Confetti CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  </head>
+  <body class="bg-slate-950 text-slate-100 overflow-hidden select-none">
+    
+    <!-- 1. 3D Three.js WebGL Canvas Container -->
+    <div id="three-canvas-container"></div>
 
-function getGuestData(guestId) {
-  if (!guestId) return { name: "Tamu Undangan", maxGuests: 2 };
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Guests");
-  const data = sheet.getDataRange().getValues();
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0].toString().trim() === guestId.toString().trim()) {
-      return {
-        guestId: data[i][0],
-        name: data[i][1],
-        phone: data[i][2],
-        category: data[i][3],
-        maxGuests: data[i][4],
-        status: data[i][5],
-        attendingCount: data[i][6],
-        notes: data[i][7]
-      };
-    }
-  }
-  return { name: "Tamu Undangan", maxGuests: 2 };
-}
+    <!-- 2. UI Overlay Layer (HUD & Dialog) -->
+    <div id="ui-root" class="flex flex-col justify-between p-3 sm:p-6 pointer-events-none">
+      
+      <!-- Top HUD Header -->
+      <header class="flex items-center justify-between w-full pointer-events-auto">
+        <!-- Elevation Badge -->
+        <div class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-500/30 backdrop-blur-md shadow-lg">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="hud-location-name" class="text-xs font-bold text-amber-300 font-serif tracking-wide">BASECAMP PRAU</span>
+          <span class="text-slate-500">•</span>
+          <span id="hud-elevation" class="text-xs font-semibold text-emerald-300">2.000 MDPL</span>
+        </div>
 
-function saveRSVP(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Guests");
-  const rows = sheet.getDataRange().getValues();
-  let rowIndex = -1;
+        <!-- Utility Action Controls (Audio, Quality, Admin) -->
+        <div class="flex items-center space-x-2">
+          <!-- Audio Button with Equalizer -->
+          <button id="music-toggle-btn" title="Musik Pendakian" class="px-3 py-1.5 rounded-full bg-slate-950/80 border border-slate-700/80 hover:border-amber-400/60 backdrop-blur-md text-xs font-semibold text-slate-300 flex items-center space-x-1.5 transition-all shadow-lg active:scale-95">
+            <span class="text-sm">🎵</span>
+            <div id="music-visualizer" class="flex items-end space-x-0.5 h-3 opacity-0 transition-opacity">
+              <span class="w-0.5 bg-amber-400 rounded-full eq-bar-1"></span>
+              <span class="w-0.5 bg-amber-400 rounded-full eq-bar-2"></span>
+              <span class="w-0.5 bg-amber-400 rounded-full eq-bar-3"></span>
+            </div>
+          </button>
 
-  for (let i = 1; i < rows.length; i++) {
-    if (rows[i][0].toString().trim() === data.guestId.toString().trim()) {
-      rowIndex = i + 1;
-      break;
-    }
-  }
+          <!-- Quality Toggle (High / Medium / Low) -->
+          <button id="quality-toggle-btn" title="Pengaturan Grafis" class="p-2 rounded-full bg-slate-950/80 border border-slate-700/80 hover:border-amber-400/60 backdrop-blur-md text-xs text-slate-300 transition-all shadow-lg active:scale-95">
+            ⚙️
+          </button>
 
-  if (rowIndex !== -1) {
-    sheet.getRange(rowIndex, 6).setValue(data.status);
-    sheet.getRange(rowIndex, 7).setValue(data.attendingCount);
-    sheet.getRange(rowIndex, 8).setValue(data.notes || "");
-  }
+          <!-- Admin Button -->
+          <button id="admin-hud-btn" title="Panel Admin" class="p-2 rounded-full bg-slate-950/80 border border-slate-700/80 hover:border-amber-400/60 backdrop-blur-md text-xs text-slate-400 hover:text-amber-300 transition-all shadow-lg active:scale-95">
+            🔒
+          </button>
+        </div>
+      </header>
 
-  const rsvpSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("RSVP_Log");
-  rsvpSheet.appendRow([
-    new Date(),
-    data.guestId,
-    data.name,
-    data.phone,
-    data.status,
-    data.attendingCount,
-    data.notes
-  ]);
+      <!-- Center / Bottom Dynamic Checkpoint Dialogue Box -->
+      <main class="w-full flex justify-center items-center my-auto pointer-events-auto">
+        <div id="checkpoint-dialog-container" class="w-full flex justify-center px-2"></div>
+      </main>
 
-  return { success: true };
-}
+      <!-- Bottom Progress Bar -->
+      <footer class="flex items-center justify-between w-full pointer-events-auto pt-2">
+        <div class="text-[11px] font-semibold text-slate-400 bg-slate-950/70 px-3 py-1 rounded-full border border-slate-800 backdrop-blur-md">
+          <span>Jalur: Dieng ➔ Puncak 2.565 MDPL</span>
+        </div>
+        <div class="text-[11px] font-bold text-amber-300 bg-slate-950/70 px-3 py-1 rounded-full border border-amber-500/30 backdrop-blur-md">
+          <span id="hud-step-counter">1/6</span>
+        </div>
+      </footer>
 
-function saveWish(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Wishes");
-  sheet.appendRow([new Date(), data.name, data.message]);
-  return { success: true };
-}
+    </div>
 
-function getWishesData() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Wishes");
-  const data = sheet.getDataRange().getValues();
-  const wishes = [];
-  for (let i = data.length - 1; i >= 1; i--) {
-    wishes.push({
-      timestamp: data[i][0],
-      name: data[i][1],
-      message: data[i][2]
-    });
-  }
-  return { wishes: wishes };
-}
+    <!-- 3. 3D Glassmorphic Modal Overlay Layer -->
+    <div id="modal-overlay" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div id="modal-content-container" class="w-full flex justify-center items-center pointer-events-auto"></div>
+    </div>
 
-function getAdminDashboardData() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Guests");
-  const data = sheet.getDataRange().getValues();
-  let totalGuests = 0;
-  let totalInvited = 0;
-  let totalAttending = 0;
-  let totalAbsent = 0;
-  let totalUnconfirmed = 0;
-  let totalPeopleAttending = 0;
+    <!-- 4. Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center transition-opacity duration-700">
+      <div class="relative w-20 h-20 mb-6 flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full border-2 border-amber-500/20 border-t-amber-400 animate-spin"></div>
+        <span class="text-3xl animate-pulse">🏔️</span>
+      </div>
+      <h2 class="text-xl font-bold font-serif text-amber-300 tracking-wider">Gunung Prau 2.565 MDPL</h2>
+      <p class="text-xs text-slate-400 mt-2">Menyiapkan jalur pendakian 3D...</p>
+    </div>
 
-  const list = [];
-
-  for (let i = 1; i < data.length; i++) {
-    if(!data[i][0]) continue;
-    totalGuests++;
-    const max = parseInt(data[i][4]) || 1;
-    const status = data[i][5] || "Belum Konfirmasi";
-    const count = parseInt(data[i][6]) || 0;
-
-    totalInvited += max;
-    if (status === "Hadir") {
-      totalAttending++;
-      totalPeopleAttending += count;
-    } else if (status === "Tidak Hadir") {
-      totalAbsent++;
-    } else {
-      totalUnconfirmed++;
-    }
-
-    list.push({
-      guestId: data[i][0],
-      name: data[i][1],
-      phone: data[i][2],
-      category: data[i][3],
-      maxGuests: max,
-      status: status,
-      attendingCount: count,
-      notes: data[i][7]
-    });
-  }
-
-  return {
-    summary: {
-      totalGuests,
-      totalInvited,
-      totalAttending,
-      totalAbsent,
-      totalUnconfirmed,
-      totalPeopleAttending
-    },
-    guests: list
-  };
-}
-
-function adminUpdateGuest(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Guests");
-  const rows = sheet.getDataRange().getValues();
-  for (let i = 1; i < rows.length; i++) {
-    if (rows[i][0].toString().trim() === data.guestId.toString().trim()) {
-      const row = i + 1;
-      sheet.getRange(row, 2).setValue(data.name);
-      sheet.getRange(row, 3).setValue(data.phone);
-      sheet.getRange(row, 4).setValue(data.category);
-      sheet.getRange(row, 5).setValue(data.maxGuests);
-      sheet.getRange(row, 6).setValue(data.status);
-      sheet.getRange(row, 7).setValue(data.attendingCount);
-      sheet.getRange(row, 8).setValue(data.notes);
-      return { success: true };
-    }
-  }
-  return { success: false, error: "Guest not found" };
-}
-
-function adminAddGuest(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Guests");
-  sheet.appendRow([
-    data.guestId,
-    data.name,
-    data.phone,
-    data.category,
-    data.maxGuests,
-    "Belum Konfirmasi",
-    0,
-    ""
-  ]);
-  return { success: true };
-}
+    <!-- 5. Modular Scripts -->
+    <script src="./config.js"></script>
+    <script src="./js/qualityManager.js"></script>
+    <script src="./js/dataManager.js"></script>
+    <script src="./js/sceneManager.js"></script>
+    <script src="./js/characterManager.js"></script>
+    <script src="./js/cameraController.js"></script>
+    <script src="./js/animationManager.js"></script>
+    <script src="./js/uiManager.js"></script>
+    <script src="./js/rsvp.js"></script>
+    <script src="./js/admin.js"></script>
+    <script src="./js/main.js"></script>
+  </body>
+</html>
