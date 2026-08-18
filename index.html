@@ -1,1 +1,539 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzyV3K_kD5w9OXYawAr-1uV_lUyl_ElY3C9a55K4TEwNIZdfVLsffLmCYal1opByYSoVg/exec";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>The Wedding of Mempelai & Mempelai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #FAF6F0;
+      --card-bg: #FFFFFF;
+      --primary: #D8A7B1;
+      --primary-dark: #B5838D;
+      --accent: #A38288;
+      --text-main: #4A3E3D;
+      --text-light: #7A6F6D;
+      --shadow: 0 8px 30px rgba(216, 167, 177, 0.12);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+
+    #app-container {
+      width: 100%; max-width: 430px; height: 100vh; max-height: 900px; background: var(--bg-color);
+      position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.05);
+    }
+
+    .audio-btn {
+      position: absolute; top: 16px; right: 16px; z-index: 100; background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(8px); border: 1px solid var(--primary); border-radius: 50%; width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--primary-dark);
+    }
+
+    .view {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 24px 20px 80px 20px;
+      overflow-y: auto; opacity: 0; pointer-events: none; transform: scale(0.98); transition: all 0.35s ease-in-out;
+      display: flex; flex-direction: column;
+    }
+    .view.active { opacity: 1; pointer-events: auto; transform: scale(1); }
+
+    .nav-bar {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px); border-top: 1px solid rgba(216, 167, 177, 0.2); display: flex; justify-content: space-around;
+      align-items: center; z-index: 90;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-light); font-size: 10px; cursor: pointer; border: none; background: none; }
+    .nav-item.active { color: var(--primary-dark); font-weight: 600; }
+    .nav-item svg { width: 20px; height: 20px; fill: currentColor; margin-bottom: 2px; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark); font-size: 13px;
+      font-weight: 500; cursor: pointer; margin-bottom: 16px; border: none; background: none; width: fit-content;
+    }
+
+    h1, h2, h3 { font-family: 'Cormorant Garamond', serif; color: var(--text-main); font-weight: 600; }
+    h1 { font-size: 32px; } h2 { font-size: 26px; margin-bottom: 12px; }
+
+    .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid rgba(216, 167, 177, 0.15); }
+    .btn {
+      width: 100%; padding: 12px; border-radius: 12px; border: none; background: var(--primary);
+      color: white; font-weight: 500; font-size: 14px; cursor: pointer; transition: background 0.2s; text-align: center; text-decoration: none; display: block;
+    }
+    .btn:active { background: var(--primary-dark); }
+    .btn-secondary { background: transparent; border: 1px solid var(--primary); color: var(--primary-dark); }
+
+    /* Home View */
+    .hero-box { text-align: center; margin-top: 40px; }
+    .subtitle { font-size: 13px; color: var(--text-light); letter-spacing: 2px; text-transform: uppercase; }
+    .couple-name { font-size: 36px; margin: 12px 0; color: var(--primary-dark); line-height: 1.1; }
+    .quote { font-style: italic; font-size: 14px; color: var(--text-light); margin-bottom: 24px; }
+
+    .timer-container { display: flex; justify-content: space-around; background: rgba(216, 167, 177, 0.1); border-radius: 14px; padding: 12px; margin: 20px 0; }
+    .timer-box { text-align: center; }
+    .timer-num { font-size: 20px; font-weight: 600; color: var(--primary-dark); }
+    .timer-label { font-size: 10px; color: var(--text-light); }
+
+    .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+    .menu-card { background: var(--card-bg); border-radius: 14px; padding: 14px 8px; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid rgba(216, 167, 177, 0.1); }
+    .menu-card svg { width: 24px; height: 24px; fill: var(--primary); margin-bottom: 6px; }
+    .menu-card span { display: block; font-size: 11px; color: var(--text-main); font-weight: 500; }
+
+    /* Forms & Inputs */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; color: var(--text-light); margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #E2D7D9; font-size: 13px; outline: none; }
+    .form-control:focus { border-color: var(--primary); }
+
+    /* Admin Styles */
+    .admin-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: rgba(216, 167, 177, 0.1); padding: 12px; border-radius: 12px; text-align: center; }
+    .stat-num { font-size: 22px; font-weight: 600; color: var(--primary-dark); }
+    .stat-title { font-size: 11px; color: var(--text-light); }
+
+    /* Timeline */
+    .tl-item { position: relative; padding-left: 20px; border-left: 2px solid var(--primary); margin-bottom: 16px; }
+    .tl-item::before { content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--primary); }
+    .tl-date { font-size: 11px; color: var(--primary-dark); font-weight: 600; }
+    .tl-title { font-size: 14px; font-weight: 500; }
+
+    /* Modal */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 200; }
+    .modal-content { background: white; padding: 20px; border-radius: 16px; width: 90%; max-width: 360px; max-height: 80vh; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+<div id="app-container">
+  <button class="audio-btn" id="musicToggle" onclick="toggleMusic()">🎵</button>
+  <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3"></audio>
+
+  <!-- HOME VIEW -->
+  <div id="view-home" class="view active">
+    <div class="hero-box">
+      <p class="subtitle">WEDDING INVITATION</p>
+      <h1 class="couple-name">Mempelai W<br>& Mempelai P</h1>
+      <p class="quote">“Two souls, one beautiful journey.”</p>
+      <p id="guestGreeting" style="font-size: 13px; color: var(--primary-dark); font-weight: 500;"></p>
+    </div>
+
+    <div class="timer-container">
+      <div class="timer-box"><div class="timer-num" id="d">-</div><div class="timer-label">Hari</div></div>
+      <div class="timer-box"><div class="timer-num" id="h">-</div><div class="timer-label">Jam</div></div>
+      <div class="timer-box"><div class="timer-num" id="m">-</div><div class="timer-label">Menit</div></div>
+      <div class="timer-box"><div class="timer-num" id="s">-</div><div class="timer-label">Detik</div></div>
+    </div>
+
+    <div class="menu-grid">
+      <div class="menu-card" onclick="navTo('story')">📖 <span>Story</span></div>
+      <div class="menu-card" onclick="navTo('event')">📅 <span>Acara</span></div>
+      <div class="menu-card" onclick="navTo('location')">📍 <span>Lokasi</span></div>
+      <div class="menu-card" onclick="navTo('rsvp')">💌 <span>RSVP</span></div>
+      <div class="menu-card" onclick="navTo('guestbook')">💬 <span>Ucapan</span></div>
+      <div class="menu-card" onclick="navTo('gallery')">🖼️ <span>Galeri</span></div>
+      <div class="menu-card" onclick="navTo('gift')">🎁 <span>Hadiah</span></div>
+      <div class="menu-card" onclick="navTo('info')">ℹ️ <span>Info</span></div>
+      <div class="menu-card" onclick="navTo('admin')">🔒 <span>Admin</span></div>
+    </div>
+  </div>
+
+  <!-- STORY VIEW -->
+  <div id="view-story" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Perjalanan Kami</h2>
+    <div class="card">
+      <div class="tl-item"><div class="tl-date">Januari 2022</div><div class="tl-title">Pertama Bertemu</div><p style="font-size: 12px; color: var(--text-light);">Bertemu di kampus dalam sebuah proyek bersama.</p></div>
+      <div class="tl-item"><div class="tl-date">Maret 2023</div><div class="tl-title">Kencan Pertama</div><p style="font-size: 12px; color: var(--text-light);">Menikmati kopi sore dan memulai cerita bersama.</p></div>
+      <div class="tl-item"><div class="tl-date">Desember 2025</div><div class="tl-title">Lamaran</div><p style="font-size: 12px; color: var(--text-light);">Mengingat komitmen untuk melangkah ke jenjang yang lebih serius.</p></div>
+    </div>
+  </div>
+
+  <!-- EVENT VIEW -->
+  <div id="view-event" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Rangkaian Acara</h2>
+    <div class="card">
+      <h3>Akad Nikah</h3>
+      <p style="font-size: 13px; margin: 6px 0;">Minggu, 20 September 2026</p>
+      <p style="font-size: 12px; color: var(--text-light);">08:00 - 10:00 WIB</p>
+      <p style="font-size: 12px; color: var(--text-light);">Gedung Mawar, Jakarta</p>
+      <a href="https://calendar.google.com" target="_blank" class="btn btn-secondary" style="margin-top: 12px;">+ Google Calendar</a>
+    </div>
+    <div class="card">
+      <h3>Resepsi</h3>
+      <p style="font-size: 13px; margin: 6px 0;">Minggu, 20 September 2026</p>
+      <p style="font-size: 12px; color: var(--text-light);">11:00 - 14:00 WIB</p>
+      <p style="font-size: 12px; color: var(--text-light);">Gedung Mawar, Jakarta</p>
+    </div>
+  </div>
+
+  <!-- LOCATION VIEW -->
+  <div id="view-location" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Lokasi Acara</h2>
+    <div class="card">
+      <h3>Gedung Mawar</h3>
+      <p style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;">Jl. Melati No. 123, Jakarta Selatan</p>
+      <iframe src="https://maps.google.com/maps?q=Jakarta&t=&z=13&ie=UTF8&iwloc=&output=embed" width="100%" height="180" style="border:0; border-radius:10px;" allowfullscreen="" loading="lazy"></iframe>
+      <a href="https://maps.google.com" target="_blank" class="btn" style="margin-top: 12px;">Buka Google Maps</a>
+    </div>
+  </div>
+
+  <!-- RSVP VIEW -->
+  <div id="view-rsvp" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Konfirmasi Kehadiran</h2>
+    <div class="card">
+      <form id="rsvpForm" onsubmit="submitRSVP(event)">
+        <div class="form-group">
+          <label>Nama Tamu</label>
+          <input type="text" id="rsvpName" class="form-control" required readonly>
+        </div>
+        <div class="form-group">
+          <label>Nomor WhatsApp</label>
+          <input type="text" id="rsvpPhone" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Konfirmasi Kehadiran</label>
+          <select id="rsvpStatus" class="form-control">
+            <option value="Hadir">Hadir</option>
+            <option value="Tidak Hadir">Tidak Hadir</option>
+            <option value="Ragu-ragu">Ragu-ragu</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Jumlah Tamu Hadir</label>
+          <select id="rsvpCount" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label>Catatan / Kebutuhan Khusus (Opsional)</label>
+          <textarea id="rsvpNotes" class="form-control" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn">Kirim Konfirmasi</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- GUESTBOOK VIEW -->
+  <div id="view-guestbook" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Buku Tamu & Ucapan</h2>
+    <div class="card">
+      <form onsubmit="submitWish(event)">
+        <div class="form-group">
+          <input type="text" id="wishName" placeholder="Nama Anda" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <textarea id="wishMessage" placeholder="Tuliskan ucapan & doa..." class="form-control" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn">Kirim Ucapan</button>
+      </form>
+    </div>
+    <div id="wishesList"></div>
+  </div>
+
+  <!-- GALLERY VIEW -->
+  <div id="view-gallery" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Galeri Foto</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=400" style="width:100%; border-radius:12px;">
+      <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400" style="width:100%; border-radius:12px;">
+    </div>
+  </div>
+
+  <!-- GIFT VIEW -->
+  <div id="view-gift" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Digital Gift</h2>
+    <div class="card">
+      <h3>Bank BCA</h3>
+      <p style="font-size: 12px; color: var(--text-light);">a.n. Mempelai Wanita</p>
+      <p style="font-weight:600; margin: 8px 0;" id="accBca">1234567890</p>
+      <button class="btn btn-secondary" onclick="copyText('accBca')">Salin Rekening</button>
+    </div>
+  </div>
+
+  <!-- INFO VIEW -->
+  <div id="view-info" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Informasi Acara</h2>
+    <div class="card">
+      <h3>Dress Code</h3>
+      <p style="font-size: 12px; color: var(--text-light);">Pastel / Neutral Colors</p>
+    </div>
+  </div>
+
+  <!-- ADMIN VIEW -->
+  <div id="view-admin" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Admin Dashboard</h2>
+    <div id="adminAuth">
+      <div class="card">
+        <div class="form-group">
+          <label>Passcode Admin</label>
+          <input type="password" id="adminPass" class="form-control">
+        </div>
+        <button class="btn" onclick="loadAdminData()">Login Admin</button>
+      </div>
+    </div>
+    <div id="adminContent" style="display: none;">
+      <div class="admin-stat-grid">
+        <div class="stat-card"><div class="stat-num" id="stTotal">0</div><div class="stat-title">Undangan</div></div>
+        <div class="stat-card"><div class="stat-num" id="stAttending">0</div><div class="stat-title">Hadir</div></div>
+        <div class="stat-card"><div class="stat-num" id="stAbsent">0</div><div class="stat-title">Tdk Hadir</div></div>
+        <div class="stat-card"><div class="stat-num" id="stPeople">0</div><div class="stat-title">Total Orang</div></div>
+      </div>
+      <button class="btn btn-secondary" style="margin-bottom:12px;" onclick="openAddGuestModal()">+ Tambah Tamu Baru</button>
+      <h3>Daftar Tamu (Klik untuk Edit)</h3>
+      <div id="adminGuestList"></div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BAR -->
+  <div class="nav-bar">
+    <button class="nav-item active" onclick="navTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
+    </button>
+    <button class="nav-item" onclick="navTo('event')">
+      <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+      Acara
+    </button>
+    <button class="nav-item" onclick="navTo('rsvp')">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      RSVP
+    </button>
+  </div>
+</div>
+
+<!-- MODAL EDIT/TAMBAH TAMU -->
+<div id="guestModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Edit Data Tamu</h3>
+    <form onsubmit="saveGuestAdmin(event)">
+      <input type="hidden" id="editGuestId">
+      <div class="form-group"><label>Nama</label><input type="text" id="editName" class="form-control" required></div>
+      <div class="form-group"><label>WhatsApp</label><input type="text" id="editPhone" class="form-control"></div>
+      <div class="form-group"><label>Kategori</label><input type="text" id="editCategory" class="form-control"></div>
+      <div class="form-group"><label>Max Undangan</label><input type="number" id="editMax" class="form-control" required></div>
+      <div class="form-group"><label>Status Kehadiran</label>
+        <select id="editStatus" class="form-control">
+          <option value="Belum Konfirmasi">Belum Konfirmasi</option>
+          <option value="Hadir">Hadir</option>
+          <option value="Tidak Hadir">Tidak Hadir</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Jumlah Hadir</label><input type="number" id="editCount" class="form-control"></div>
+      <div class="form-group"><label>Catatan</label><input type="text" id="editNotes" class="form-control"></div>
+      <button type="submit" class="btn">Simpan Data</button>
+      <button type="button" class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal()">Batal</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // GANTI SCRIPT_URL DI BAWAH INI DENGAN URL GOOGLE APPS SCRIPT ANDA
+  const API_URL = "https://script.google.com/macros/s/AKfycbzyV3K_kD5w9OXYawAr-1uV_lUyl_ElY3C9a55K4TEwNIZdfVLsffLmCYal1opByYSoVg/exec";
+  
+  let currentGuest = { guestId: "", name: "Tamu Undangan", maxGuests: 2 };
+  let isEditMode = false;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const guestId = params.get('guest');
+    if (guestId) {
+      fetch(`${API_URL}?action=getGuest&guestId=${guestId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.name) {
+            currentGuest = data;
+            document.getElementById('guestGreeting').innerText = `Kepada Yth. ${data.name}`;
+            document.getElementById('rsvpName').value = data.name;
+            document.getElementById('rsvpPhone').value = data.phone || "";
+            setupRsvpCount(data.maxGuests);
+          }
+        });
+    } else {
+      setupRsvpCount(2);
+    }
+    startTimer();
+    loadWishes();
+  });
+
+  function navTo(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${viewId}`).classList.add('active');
+  }
+
+  function setupRsvpCount(max) {
+    const select = document.getElementById('rsvpCount');
+    select.innerHTML = '';
+    for (let i = 1; i <= max; i++) {
+      select.innerHTML += `<option value="${i}">${i} Orang</option>`;
+    }
+  }
+
+  function startTimer() {
+    const target = new Date('2026-09-20T08:00:00').getTime();
+    setInterval(() => {
+      const now = new Date().getTime();
+      const diff = target - now;
+      if (diff > 0) {
+        document.getElementById('d').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+        document.getElementById('h').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById('m').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('s').innerText = Math.floor((diff % (1000 * 60)) / 1000);
+      }
+    }, 1000);
+  }
+
+  function submitRSVP(e) {
+    e.preventDefault();
+    const payload = {
+      action: "submitRSVP",
+      data: {
+        guestId: currentGuest.guestId || "ANONYMOUS",
+        name: document.getElementById('rsvpName').value,
+        phone: document.getElementById('rsvpPhone').value,
+        status: document.getElementById('rsvpStatus').value,
+        attendingCount: document.getElementById('rsvpCount').value,
+        notes: document.getElementById('rsvpNotes').value
+      }
+    };
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .then(res => res.json())
+      .then(() => alert("Terima kasih atas konfirmasinya. Kami sangat menantikan kehadiran Anda."));
+  }
+
+  function submitWish(e) {
+    e.preventDefault();
+    const name = document.getElementById('wishName').value;
+    const msg = document.getElementById('wishMessage').value;
+    const payload = { action: "submitWish", data: { name: name, message: msg } };
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .then(res => res.json())
+      .then(() => {
+        document.getElementById('wishMessage').value = '';
+        loadWishes();
+      });
+  }
+
+  function loadWishes() {
+    fetch(`${API_URL}?action=getWishes`)
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('wishesList');
+        container.innerHTML = '';
+        if (data.wishes) {
+          data.wishes.forEach(w => {
+            container.innerHTML += `
+              <div class="card" style="padding:12px; margin-bottom:8px;">
+                <p style="font-size:12px; font-weight:600; color:var(--primary-dark);">${w.name}</p>
+                <p style="font-size:12px; color:var(--text-main); margin-top:4px;">${w.message}</p>
+              </div>`;
+          });
+        }
+      });
+  }
+
+  function loadAdminData() {
+    const pass = document.getElementById('adminPass').value;
+    fetch(`${API_URL}?action=getAdminData&passcode=${pass}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) { alert("Passcode Salah!"); return; }
+        document.getElementById('adminAuth').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+
+        document.getElementById('stTotal').innerText = data.summary.totalGuests;
+        document.getElementById('stAttending').innerText = data.summary.totalAttending;
+        document.getElementById('stAbsent').innerText = data.summary.totalAbsent;
+        document.getElementById('stPeople').innerText = data.summary.totalPeopleAttending;
+
+        const list = document.getElementById('adminGuestList');
+        list.innerHTML = '';
+        data.guests.forEach(g => {
+          list.innerHTML += `
+            <div class="card" style="padding:12px; margin-bottom:8px; cursor:pointer;" onclick='openEditModal(${JSON.stringify(g)})'>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>${g.name} (${g.guestId})</strong>
+                <span style="font-size:11px; padding:2px 6px; border-radius:6px; background:#eee;">${g.status}</span>
+              </div>
+              <p style="font-size:11px; color:var(--text-light); margin-top:4px;">Undangan: ${g.maxGuests} | Hadir: ${g.attendingCount}</p>
+            </div>`;
+        });
+      });
+  }
+
+  function openEditModal(g) {
+    isEditMode = true;
+    document.getElementById('modalTitle').innerText = "Edit Data Tamu";
+    document.getElementById('editGuestId').value = g.guestId;
+    document.getElementById('editName').value = g.name;
+    document.getElementById('editPhone').value = g.phone;
+    document.getElementById('editCategory').value = g.category;
+    document.getElementById('editMax').value = g.maxGuests;
+    document.getElementById('editStatus').value = g.status;
+    document.getElementById('editCount').value = g.attendingCount;
+    document.getElementById('editNotes').value = g.notes;
+    document.getElementById('guestModal').style.display = 'flex';
+  }
+
+  function openAddGuestModal() {
+    isEditMode = false;
+    document.getElementById('modalTitle').innerText = "Tambah Tamu Baru";
+    document.getElementById('editGuestId').value = "G" + Math.floor(100 + Math.random() * 900);
+    document.getElementById('editName').value = "";
+    document.getElementById('editPhone').value = "";
+    document.getElementById('editCategory').value = "Umum";
+    document.getElementById('editMax').value = 2;
+    document.getElementById('editStatus').value = "Belum Konfirmasi";
+    document.getElementById('editCount').value = 0;
+    document.getElementById('editNotes').value = "";
+    document.getElementById('guestModal').style.display = 'flex';
+  }
+
+  function closeModal() { document.getElementById('guestModal').style.display = 'none'; }
+
+  function saveGuestAdmin(e) {
+    e.preventDefault();
+    const pass = document.getElementById('adminPass').value;
+    const payload = {
+      action: isEditMode ? "adminUpdateGuest" : "adminAddGuest",
+      passcode: pass,
+      data: {
+        guestId: document.getElementById('editGuestId').value,
+        name: document.getElementById('editName').value,
+        phone: document.getElementById('editPhone').value,
+        category: document.getElementById('editCategory').value,
+        maxGuests: document.getElementById('editMax').value,
+        status: document.getElementById('editStatus').value,
+        attendingCount: document.getElementById('editCount').value,
+        notes: document.getElementById('editNotes').value
+      }
+    };
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .then(res => res.json())
+      .then(() => {
+        closeModal();
+        loadAdminData();
+      });
+  }
+
+  function copyText(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text);
+    alert("Copied!");
+  }
+
+  function toggleMusic() {
+    const audio = document.getElementById('bgMusic');
+    if (audio.paused) { audio.play(); } else { audio.pause(); }
+  }
+</script>
+</body>
+</html>
