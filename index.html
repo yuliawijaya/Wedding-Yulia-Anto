@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Undangan Pernikahan - Yulia & Anto</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Wedding of Yulia & Anto</title>
+
     <!-- FAVICON PINK PASTEL MANIS -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='30' fill='%23ffcad4'/><path d='M50 80 C20 55 10 38 25 24 C38 12 48 25 50 30 C52 25 62 12 75 24 C90 38 80 55 50 80 Z' fill='%23f4acb7'/><path d='M50 72 C26 50 18 36 30 25 C40 15 48 25 50 29 C52 25 60 15 70 25 C82 36 74 50 50 72 Z' fill='%239e2a2b'/></svg>">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -27,12 +27,12 @@
                         sans: ['"Montserrat"', 'sans-serif'],
                     },
                     colors: {
-                        pastelPink: '#ffcad4',
-                        softRose: '#f4acb7',
-                        lightRose: '#fff0f3',
-                        deepRose: '#9e2a2b',
-                        accentPink: '#ffb3c1',
-                        borderPink: '#ffccd5'
+                        pastelBg: '#FDF8F5',
+                        pastelPink: '#E8C5C8',
+                        softPink: '#F4DCDA',
+                        darkPink: '#A66E74',
+                        accentPink: '#C88A90',
+                        deepRose: '#8C4A51'
                     }
                 }
             }
@@ -42,320 +42,313 @@
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #fff0f3;
+            background-color: #f3ece8;
             color: #4a4a4a;
-            overflow-x: hidden;
+            touch-action: manipulation;
         }
 
-        .cover-screen {
+        /* App Frame Layout */
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #FDF8F5;
+            position: relative;
+            box-shadow: 0 0 25px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Views management (SPA) */
+        .app-view {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px; /* Space for Bottom Nav */
+        }
+
+        .app-view.active {
+            display: block;
+        }
+
+        /* Cover Screen Overlay */
+        .cover-overlay {
             position: fixed;
             inset: 0;
-            z-index: 50;
-            transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+            z-index: 100;
+            max-width: 430px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #FDF8F5 0%, #F4DCDA 100%);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .cover-screen.opened {
+        .cover-overlay.opened {
             transform: translateY(-100%);
-            opacity: 0;
-            pointer-events: none;
         }
 
-        @keyframes pulse-slow {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .animate-pulse-slow {
-            animation: pulse-slow 3s infinite ease-in-out;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #fff0f3;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #f4acb7;
-            border-radius: 10px;
-        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #E8C5C8; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-lightRose text-gray-800 selection:bg-pastelPink selection:text-deepRose">
+<body>
 
     <!-- AUDIO PLAYER -->
     <audio id="bg-music" loop>
         <source id="music-source" src="https://assets.mixkit.co/music/preview/mixkit-romantic-wedding-482.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- FLOATING BUTTONS -->
-    <div class="fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end">
-        <button onclick="openAdminModal()" class="bg-white/90 backdrop-blur-md p-3.5 rounded-full shadow-lg border-2 border-pastelPink text-deepRose hover:bg-pastelPink hover:scale-110 transition duration-300" title="Login Admin">
-            <i class="fa-solid fa-user-gear text-lg"></i>
+    <div class="app-container">
+
+        <!-- FLOATING MUSIC BUTTON -->
+        <button id="music-btn" onclick="toggleMusic()" class="fixed top-4 right-4 z-40 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-md text-darkPink border border-softPink hidden">
+            <i id="music-icon" class="fa-solid fa-music"></i>
         </button>
 
-        <button id="music-btn" onclick="toggleMusic()" class="bg-white/90 backdrop-blur-md p-3.5 rounded-full shadow-lg border-2 border-pastelPink text-deepRose hover:scale-110 transition duration-300 hidden">
-            <i id="music-icon" class="fa-solid fa-music text-lg"></i>
-        </button>
-    </div>
-
-    <!-- COVER SCREEN -->
-    <div id="cover" class="cover-screen bg-gradient-to-b from-pastelPink via-lightRose to-white flex flex-col items-center justify-between p-6 text-center shadow-2xl">
-        <div class="pt-10">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 backdrop-blur-sm text-deepRose border border-softRose/40 text-xs font-semibold tracking-widest uppercase mb-3 shadow-sm">
-                <i class="fa-solid fa-heart text-softRose text-xs"></i> The Wedding Of
+        <!-- COVER OVERLAY (APP START) -->
+        <div id="cover" class="cover-overlay flex flex-col justify-between p-8 text-center">
+            <div class="pt-8">
+                <span class="text-xs uppercase tracking-widest text-darkPink font-semibold bg-white/60 px-4 py-1.5 rounded-full border border-softPink">The Wedding Of</span>
+                <h1 class="font-cursive text-6xl text-deepRose my-4 display-couple-names">Yulia & Anto</h1>
+                <p class="text-xs text-gray-500 italic max-w-xs mx-auto">Kami mengundang Anda untuk berbagi kebahagiaan di hari pernikahan kami.</p>
             </div>
-            <h1 class="font-cursive text-6xl md:text-7xl text-deepRose my-3 display-couple-names">Yulia & Anto</h1>
-            <p class="text-xs md:text-sm text-gray-600 italic max-w-md mx-auto">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri..."</p>
-        </div>
 
-        <div class="my-auto py-6">
-            <div class="w-48 h-48 md:w-56 md:h-56 mx-auto rounded-full border-4 border-white shadow-xl overflow-hidden p-2 bg-pastelPink/50 animate-pulse-slow relative">
-                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=600" alt="Mempelai" class="w-full h-full object-cover rounded-full">
-            </div>
-        </div>
-
-        <div class="pb-8 w-full max-w-sm">
-            <p class="text-xs text-gray-500 mb-3 font-medium">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-            <button onclick="openInvitation()" class="w-full bg-deepRose hover:bg-rose-900 text-white font-medium py-3.5 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2.5 mx-auto group">
-                <i class="fa-envelope-open text-sm group-hover:scale-110 transition duration-300"></i> Buka Undangan
-            </button>
-        </div>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <main class="max-w-md md:max-w-xl mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden border-x border-pink-100">
-        
-        <!-- HERO SECTION -->
-        <section class="relative px-6 pt-16 pb-12 text-center bg-gradient-to-b from-lightRose to-white">
-            <div class="inline-block p-2 px-4 rounded-full bg-pastelPink/60 text-deepRose text-xs font-semibold tracking-widest uppercase mb-4 shadow-sm">
-                Walimatul 'Ursy
-            </div>
-            <h2 class="font-cursive text-6xl text-deepRose mb-2 display-couple-names">Yulia & Anto</h2>
-            <p class="text-gray-500 font-serif text-sm italic">Minggu, 20 September 2026</p>
-
-            <div class="mt-8 relative">
-                <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=800" alt="Flower Decor" class="w-full h-64 object-cover rounded-3xl shadow-md border-2 border-pastelPink/40">
-            </div>
-        </section>
-
-        <!-- AYAT SUCI -->
-        <section class="px-6 py-10 text-center bg-lightRose/60">
-            <i class="fa-solid fa-quote-left text-3xl text-softRose mb-4 block"></i>
-            <p class="text-xs md:text-sm text-gray-600 leading-relaxed italic font-serif">
-                "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang."
-            </p>
-            <p class="text-xs font-semibold text-deepRose mt-3 tracking-wider">— QS. Ar-Rum: 21 —</p>
-        </section>
-
-        <!-- PASANGAN MEMPELAI -->
-        <section class="px-6 py-12 text-center">
-            <h3 class="font-serif text-2xl text-gray-800 font-semibold mb-2">Mempelai Pria & Wanita</h3>
-            <p class="text-xs text-gray-500 mb-10">Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan.</p>
-
-            <div class="mb-10">
-                <div class="w-36 h-36 mx-auto rounded-full overflow-hidden shadow-md mb-4 border-4 border-pastelPink p-1">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400" alt="Yulia" class="w-full h-full object-cover rounded-full">
+            <div class="my-auto">
+                <div class="w-44 h-44 mx-auto rounded-full border-4 border-white shadow-lg overflow-hidden p-1.5 bg-softPink/40">
+                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=400" alt="Mempelai" class="w-full h-full object-cover rounded-full">
                 </div>
-                <h4 id="display-bride-name" class="font-serif text-2xl text-deepRose font-bold">Yulia Wijaya, S.Kom</h4>
-                <p class="text-xs text-gray-500 mt-1">Putri pertama dari</p>
-                <p class="text-xs font-medium text-gray-700">Bpk. Wijaya & Ibu Endang</p>
             </div>
 
-            <div class="font-cursive text-4xl text-softRose my-4">&</div>
+            <div class="pb-6">
+                <p class="text-xs text-gray-500 mb-2">Kepada Yth. Bapak/Ibu/Saudara/i</p>
+                <button onclick="openInvitationApp()" class="w-full bg-darkPink hover:bg-deepRose text-white font-medium py-3.5 px-6 rounded-2xl shadow-md transition duration-300 flex items-center justify-center gap-2">
+                    <i class="fa-envelope-open text-sm"></i> Buka Undangan
+                </button>
+            </div>
+        </div>
 
-            <div class="mt-6">
-                <div class="w-36 h-36 mx-auto rounded-full overflow-hidden shadow-md mb-4 border-4 border-pastelPink p-1">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" alt="Anto" class="w-full h-full object-cover rounded-full">
+        <!-- VIEW 1: HOME PAGE -->
+        <div id="view-home" class="app-view active">
+            <header class="p-6 text-center pt-10 bg-gradient-to-b from-softPink/40 to-transparent">
+                <span class="text-[10px] uppercase tracking-widest text-darkPink font-semibold">Walimatul 'Ursy</span>
+                <h2 class="font-cursive text-5xl text-deepRose my-2 display-couple-names">Yulia & Anto</h2>
+                <p class="text-xs font-serif italic text-gray-500">Minggu, 20 September 2026</p>
+            </header>
+
+            <section class="px-6 py-4">
+                <div class="rounded-3xl overflow-hidden shadow-sm border border-softPink/50 mb-6">
+                    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600" alt="Banner" class="w-full h-48 object-cover">
                 </div>
-                <h4 id="display-groom-name" class="font-serif text-2xl text-deepRose font-bold">Anto Prasetyo, S.T</h4>
-                <p class="text-xs text-gray-500 mt-1">Putra bungsu dari</p>
-                <p class="text-xs font-medium text-gray-700">Bpk. Prasetyo & Ibu Sumarni</p>
-            </div>
-        </section>
 
-        <!-- ACARA & RANGKAIAN -->
-        <section class="px-6 py-12 bg-gradient-to-b from-white via-lightRose/50 to-white text-center">
-            <h3 class="font-serif text-2xl text-gray-800 font-semibold mb-8">Acara Pernikahan</h3>
+                <div class="text-center bg-white p-5 rounded-2xl shadow-xs border border-softPink/40 mb-6">
+                    <i class="fa-solid fa-quote-left text-2xl text-pastelPink mb-2"></i>
+                    <p class="text-xs text-gray-600 leading-relaxed italic font-serif">
+                        "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri..."
+                    </p>
+                    <p class="text-[10px] font-semibold text-darkPink mt-2 tracking-wider">— QS. Ar-Rum: 21 —</p>
+                </div>
 
-            <div class="grid gap-6">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-pastelPink/60">
-                    <div class="w-12 h-12 mx-auto bg-pastelPink/50 text-deepRose rounded-full flex items-center justify-center text-xl mb-3">
+                <div class="space-y-6 text-center">
+                    <h3 class="font-serif text-lg font-bold text-gray-800">Mempelai</h3>
+                    
+                    <div class="bg-white p-4 rounded-2xl border border-softPink/30">
+                        <div class="w-24 h-24 mx-auto rounded-full overflow-hidden mb-3 border-2 border-pastelPink">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300" class="w-full h-full object-cover">
+                        </div>
+                        <h4 id="display-bride-name" class="font-serif text-xl font-bold text-deepRose">Yulia Wijaya, S.Kom</h4>
+                        <p class="text-[11px] text-gray-500">Putri pertama dari Bpk. Wijaya & Ibu Endang</p>
+                    </div>
+
+                    <div class="font-cursive text-3xl text-pastelPink">&</div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-softPink/30">
+                        <div class="w-24 h-24 mx-auto rounded-full overflow-hidden mb-3 border-2 border-pastelPink">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300" class="w-full h-full object-cover">
+                        </div>
+                        <h4 id="display-groom-name" class="font-serif text-xl font-bold text-deepRose">Anto Prasetyo, S.T</h4>
+                        <p class="text-[11px] text-gray-500">Putra bungsu dari Bpk. Prasetyo & Ibu Sumarni</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- VIEW 2: ACARA PAGE -->
+        <div id="view-acara" class="app-view">
+            <header class="p-6 text-center pt-8">
+                <h2 class="font-serif text-2xl font-bold text-gray-800">Rangkaian Acara</h2>
+                <p class="text-xs text-gray-500">Waktu & Lokasi Pernikahan</p>
+            </header>
+
+            <section class="px-6 space-y-4">
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-softPink/50 text-center">
+                    <div class="w-10 h-10 mx-auto bg-softPink/50 text-darkPink rounded-full flex items-center justify-center text-lg mb-2">
                         <i class="fa-solid fa-ring"></i>
                     </div>
-                    <h4 class="font-serif text-xl font-bold text-gray-800 mb-1">Akad Nikah</h4>
-                    <p class="text-xs text-gray-500 mb-2"><i class="fa-regular fa-calendar-check mr-1.5 text-softRose"></i> Minggu, 20 September 2026</p>
-                    <p class="text-xs text-gray-600 font-medium"><i class="fa-regular fa-clock mr-1.5 text-softRose"></i> 08.00 WIB - Selesai</p>
-                    <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-location-dot mr-1.5 text-softRose"></i> Gedung Serbaguna Utama, Wonosobo</p>
+                    <h3 class="font-serif text-lg font-bold text-gray-800">Akad Nikah</h3>
+                    <p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-calendar-check mr-1 text-darkPink"></i> Minggu, 20 September 2026</p>
+                    <p class="text-xs text-gray-600 font-medium mt-0.5"><i class="fa-regular fa-clock mr-1 text-darkPink"></i> 08.00 WIB - Selesai</p>
+                    <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-location-dot mr-1 text-darkPink"></i> Gedung Serbaguna Utama, Wonosobo</p>
                 </div>
 
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-pastelPink/60">
-                    <div class="w-12 h-12 mx-auto bg-pastelPink/50 text-deepRose rounded-full flex items-center justify-center text-xl mb-3">
+                <div class="bg-white p-5 rounded-2xl shadow-xs border border-softPink/50 text-center">
+                    <div class="w-10 h-10 mx-auto bg-softPink/50 text-darkPink rounded-full flex items-center justify-center text-lg mb-2">
                         <i class="fa-solid fa-champagne-glasses"></i>
                     </div>
-                    <h4 class="font-serif text-xl font-bold text-gray-800 mb-1">Resepsi Pernikahan</h4>
-                    <p class="text-xs text-gray-500 mb-2"><i class="fa-regular fa-calendar-check mr-1.5 text-softRose"></i> Minggu, 20 September 2026</p>
-                    <p class="text-xs text-gray-600 font-medium"><i class="fa-regular fa-clock mr-1.5 text-softRose"></i> 11.00 WIB - 14.00 WIB</p>
-                    <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-location-dot mr-1.5 text-softRose"></i> Gedung Serbaguna Utama, Wonosobo</p>
-                </div>
-            </div>
-
-            <a href="https://maps.google.com" target="_blank" class="mt-8 inline-flex items-center gap-2 bg-white hover:bg-pastelPink/20 border-2 border-deepRose text-deepRose text-xs font-semibold py-3 px-6 rounded-full shadow-sm transition">
-                <i class="fa-solid fa-map-location-dot text-base"></i> Buka Google Maps
-            </a>
-        </section>
-
-        <!-- RSVP & UCAPAN -->
-        <section class="px-6 py-12 bg-white text-center">
-            <h3 class="font-serif text-2xl text-gray-800 font-semibold mb-2">Konfirmasi Kehadiran & Doa</h3>
-            <p class="text-xs text-gray-500 mb-6">Berikan doa terbaik serta konfirmasi kehadiran Anda untuk menyempurnakan kebahagiaan kami.</p>
-
-            <form id="rsvp-form" onsubmit="submitRSVP(event)" class="space-y-4 text-left bg-lightRose/70 p-6 rounded-3xl border border-pastelPink/60">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="rsvp-name" required placeholder="Masukkan Nama Anda" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pastelPink focus:outline-none">
+                    <h3 class="font-serif text-lg font-bold text-gray-800">Resepsi</h3>
+                    <p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-calendar-check mr-1 text-darkPink"></i> Minggu, 20 September 2026</p>
+                    <p class="text-xs text-gray-600 font-medium mt-0.5"><i class="fa-regular fa-clock mr-1 text-darkPink"></i> 11.00 - 14.00 WIB</p>
+                    <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-location-dot mr-1 text-darkPink"></i> Gedung Serbaguna Utama, Wonosobo</p>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">Konfirmasi Kehadiran</label>
-                    <select id="rsvp-presence" required class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pastelPink focus:outline-none bg-white">
-                        <option value="Hadir">Hadir</option>
-                        <option value="Tidak Hadir">Tidak Hadir</option>
-                        <option value="Ragu-Ragu">Masih Ragu</option>
-                    </select>
+                <div class="pt-2 text-center">
+                    <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-2 bg-darkPink text-white text-xs font-medium py-3 px-6 rounded-xl shadow-xs hover:bg-deepRose transition">
+                        <i class="fa-solid fa-map-location-dot"></i> Buka Peta Lokasi
+                    </a>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">Ucapan & Doa Restu</label>
-                    <textarea id="rsvp-message" rows="3" required placeholder="Tuliskan ucapan & doa Anda..." class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pastelPink focus:outline-none"></textarea>
-                </div>
-
-                <button type="submit" id="btn-submit-rsvp" class="w-full bg-deepRose hover:bg-rose-900 text-white font-medium py-3 rounded-xl shadow transition duration-300 flex items-center justify-center gap-2 text-sm">
-                    <i class="fa-paper-plane"></i> Kirim Ucapan
-                </button>
-            </form>
-
-            <div class="mt-8 text-left">
-                <h4 class="font-serif text-lg font-semibold text-gray-800 mb-3 text-center">Ucapan Doa Restu</h4>
-                <div id="wishes-container" class="space-y-3 max-h-72 overflow-y-auto pr-1">
-                    <p class="text-xs text-gray-400 text-center italic">Memuat ucapan...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- AMPLOP DIGITAL -->
-        <section class="px-6 py-12 bg-lightRose/50 text-center">
-            <h3 class="font-serif text-2xl text-gray-800 font-semibold mb-2">Amplop Digital</h3>
-            <p class="text-xs text-gray-500 mb-8">Doa restu Anda merupakan karunia terindah bagi kami. Namun jika ingin memberi hadiah, Anda dapat menyalurkannya melalui:</p>
-
-            <div class="bg-white p-6 rounded-3xl border border-pastelPink/60 shadow-sm max-w-xs mx-auto">
-                <i class="fa-solid fa-credit-card text-3xl text-softRose mb-3"></i>
-                <p id="display-bank-name" class="font-bold text-gray-800 text-sm">BANK BCA</p>
-                <p id="display-account-number" class="text-base font-semibold text-deepRose my-1 tracking-wider">1234567890</p>
-                <p id="display-account-holder" class="text-xs text-gray-500 mb-4">a.n. Yulia Wijaya</p>
-                <button onclick="copyAccount()" class="bg-pastelPink/60 hover:bg-pastelPink text-deepRose text-xs font-semibold py-2 px-5 rounded-full transition shadow-sm">
-                    <i class="fa-regular fa-copy mr-1.5"></i> Salin No. Rekening
-                </button>
-            </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="px-6 py-10 text-center bg-gray-900 text-white">
-            <h4 class="font-cursive text-4xl text-pastelPink mb-2 display-couple-names">Yulia & Anto</h4>
-            <p class="text-xs text-gray-400">Terima kasih atas doa & dukungan Anda.</p>
-            <div class="mt-6 pt-4 border-t border-gray-800 flex justify-between items-center text-[10px] text-gray-500 px-2">
-                <span>&copy; 2026 Wedding Invitation</span>
-                <button onclick="openAdminModal()" class="text-pastelPink hover:underline flex items-center gap-1">
-                    <i class="fa-solid fa-lock text-[9px]"></i> Login Admin
-                </button>
-            </div>
-        </footer>
-
-    </main>
-
-    <!-- ADMIN MODAL -->
-    <div id="admin-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative overflow-hidden border-2 border-pastelPink">
-            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-2">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-
-            <!-- LOGIN VIEW -->
-            <div id="admin-login-view">
-                <div class="text-center mb-6">
-                    <div class="w-12 h-12 bg-pastelPink/50 text-deepRose rounded-full flex items-center justify-center text-xl mx-auto mb-2">
-                        <i class="fa-solid fa-user-lock"></i>
-                    </div>
-                    <h3 class="font-serif text-xl font-bold text-gray-800">Login Administrator</h3>
-                    <p class="text-xs text-gray-500 mt-1">Masukkan kata sandi untuk mengubah pengaturan</p>
-                </div>
-
-                <form onsubmit="handleAdminLogin(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Kata Sandi (Password)</label>
-                        <input type="password" id="admin-password-input" required placeholder="Default: admin123" class="w-full px-4 py-2.5 rounded-xl border border-pink-200 text-sm focus:ring-2 focus:ring-pastelPink focus:outline-none">
-                    </div>
-                    <button type="submit" class="w-full bg-deepRose hover:bg-rose-900 text-white font-medium py-3 rounded-xl shadow transition duration-300 text-sm">
-                        Masuk Admin
-                    </button>
-                </form>
-            </div>
-
-            <!-- PANEL VIEW -->
-            <div id="admin-panel-view" class="hidden">
-                <div class="flex justify-between items-center pb-3 mb-4 border-b border-pink-100">
-                    <h3 class="font-serif text-lg font-bold text-deepRose"><i class="fa-solid fa-sliders mr-2"></i>Pengaturan Admin</h3>
-                    <button onclick="adminLogout()" class="text-xs text-red-500 hover:underline font-semibold">
-                        Logout
-                    </button>
-                </div>
-
-                <form onsubmit="saveAdminSettings(event)" class="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Mempelai Wanita</label>
-                        <input type="text" id="input-bride-name" required class="w-full px-3 py-2 rounded-xl border border-pink-200 text-xs focus:ring-2 focus:ring-pastelPink focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Mempelai Pria</label>
-                        <input type="text" id="input-groom-name" required class="w-full px-3 py-2 rounded-xl border border-pink-200 text-xs focus:ring-2 focus:ring-pastelPink focus:outline-none">
-                    </div>
-
-                    <hr class="my-2 border-pink-100">
-
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Bank / E-Wallet</label>
-                        <input type="text" id="input-bank-name" required class="w-full px-3 py-2 rounded-xl border border-pink-200 text-xs focus:ring-2 focus:ring-pastelPink focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nomor Rekening</label>
-                        <input type="text" id="input-account-number" required class="w-full px-3 py-2 rounded-xl border border-pink-200 text-xs focus:ring-2 focus:ring-pastelPink focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Atas Nama (Pemilik Rekening)</label>
-                        <input type="text" id="input-account-holder" required class="w-full px-3 py-2 rounded-xl border border-pink-200 text-xs focus:ring-2 focus:ring-pastelPink focus:outline-none">
-                    </div>
-
-                    <hr class="my-2 border-pink-100">
-
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">URL Lagu Latar (.mp3)</label>
-                        <input type="url" id="input-music-url" required class="w-full px-3 py-2 rounded-xl border border-pink-200 text-xs focus:ring-2 focus:ring-pastelPink focus:outline-none">
-                    </div>
-
-                    <div class="pt-3 flex gap-2">
-                        <button type="button" onclick="resetAdminSettings()" class="w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs py-2.5 rounded-xl font-medium transition">
-                            Reset
-                        </button>
-                        <button type="submit" class="w-2/3 bg-deepRose hover:bg-rose-900 text-white text-xs py-2.5 rounded-xl font-medium transition shadow">
-                            Simpan Perubahan
+                <!-- AMPLOP DIGITAL -->
+                <div class="mt-8 pt-6 border-t border-softPink/40 text-center">
+                    <h3 class="font-serif text-lg font-bold text-gray-800 mb-1">Amplop Digital</h3>
+                    <p class="text-[11px] text-gray-500 mb-4">Transfer kado pernikahan secara langsung:</p>
+                    
+                    <div class="bg-white p-4 rounded-2xl border border-softPink/50 max-w-xs mx-auto">
+                        <p id="display-bank-name" class="font-bold text-gray-800 text-xs">BANK BCA</p>
+                        <p id="display-account-number" class="text-base font-bold text-darkPink my-1">1234567890</p>
+                        <p id="display-account-holder" class="text-[11px] text-gray-500 mb-3">a.n. Yulia Wijaya</p>
+                        <button onclick="copyAccount()" class="bg-softPink/60 hover:bg-softPink text-darkPink text-[11px] font-semibold py-1.5 px-4 rounded-full transition">
+                            <i class="fa-regular fa-copy mr-1"></i> Salin Rekening
                         </button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </section>
         </div>
+
+        <!-- VIEW 3: RSVP PAGE -->
+        <div id="view-rsvp" class="app-view">
+            <header class="p-6 text-center pt-8">
+                <h2 class="font-serif text-2xl font-bold text-gray-800">RSVP & Ucapan</h2>
+                <p class="text-xs text-gray-500">Konfirmasi Kehadiran & Doa Restu</p>
+            </header>
+
+            <section class="px-6">
+                <form id="rsvp-form" onsubmit="submitRSVP(event)" class="space-y-3 bg-white p-5 rounded-2xl border border-softPink/50 shadow-xs mb-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama</label>
+                        <input type="text" id="rsvp-name" required placeholder="Nama Anda" class="w-full px-3 py-2 rounded-xl border border-softPink text-xs focus:ring-1 focus:ring-darkPink focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Kehadiran</label>
+                        <select id="rsvp-presence" class="w-full px-3 py-2 rounded-xl border border-softPink text-xs focus:ring-1 focus:ring-darkPink focus:outline-none bg-white">
+                            <option value="Hadir">Hadir</option>
+                            <option value="Tidak Hadir">Tidak Hadir</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Ucapan / Doa</label>
+                        <textarea id="rsvp-message" rows="3" required placeholder="Tulis ucapan selamat..." class="w-full px-3 py-2 rounded-xl border border-softPink text-xs focus:ring-1 focus:ring-darkPink focus:outline-none"></textarea>
+                    </div>
+                    <button type="submit" id="btn-submit-rsvp" class="w-full bg-darkPink text-white text-xs font-medium py-2.5 rounded-xl hover:bg-deepRose transition">
+                        Kirim Ucapan
+                    </button>
+                </form>
+
+                <div class="space-y-3">
+                    <h3 class="font-serif text-sm font-bold text-gray-800">Ucapan Doa Restu</h3>
+                    <div id="wishes-container" class="space-y-2.5 max-h-60 overflow-y-auto">
+                        <p class="text-xs text-gray-400 text-center italic">Memuat ucapan...</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- VIEW 4: ADMIN DASHBOARD (LENGKAP WITH LOGIN) -->
+        <div id="view-admin" class="app-view">
+            <header class="p-6 text-center pt-8 relative">
+                <button onclick="switchView('home')" class="absolute top-8 left-6 text-xs text-gray-500 flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali
+                </button>
+                <h2 class="font-serif text-2xl font-bold text-gray-800">Admin Dashboard</h2>
+                <p class="text-xs text-gray-500">Kelola Data & Pengaturan Website</p>
+            </header>
+
+            <section class="px-6">
+                <!-- FORM LOGIN ADMIN -->
+                <div id="admin-login-box" class="bg-white p-6 rounded-2xl border border-softPink/60 shadow-xs text-center">
+                    <i class="fa-solid fa-lock text-3xl text-darkPink mb-3 block"></i>
+                    <p class="text-xs font-semibold text-gray-700 mb-4">Masukkan Passcode Admin untuk masuk</p>
+                    
+                    <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+                        <input type="password" id="admin-passcode-input" placeholder="Passcode (Default: admin123)" required class="w-full px-3 py-2.5 text-center rounded-xl border border-softPink text-xs focus:ring-1 focus:ring-darkPink focus:outline-none">
+                        <button type="submit" class="w-full bg-darkPink text-white text-xs font-medium py-2.5 rounded-xl hover:bg-deepRose transition">
+                            Login Admin
+                        </button>
+                    </form>
+                </div>
+
+                <!-- PANEL EDIT SETTINGS (TERBUKA SETELAH PASSCODE BENAR) -->
+                <div id="admin-panel-box" class="hidden bg-white p-5 rounded-2xl border border-softPink/60 shadow-xs space-y-4">
+                    <div class="flex justify-between items-center pb-2 border-b border-softPink/40">
+                        <span class="text-xs font-bold text-darkPink"><i class="fa-solid fa-sliders mr-1"></i> Edit Informasi Undangan</span>
+                        <button onclick="adminLogout()" class="text-[10px] text-red-500 font-semibold hover:underline">Logout</button>
+                    </div>
+
+                    <form onsubmit="saveAdminSettings(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Mempelai Wanita</label>
+                            <input type="text" id="input-bride-name" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Mempelai Pria</label>
+                            <input type="text" id="input-groom-name" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
+                        </div>
+                        <hr class="border-softPink/30">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Bank</label>
+                            <input type="text" id="input-bank-name" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nomor Rekening</label>
+                            <input type="text" id="input-account-number" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Atas Nama Rekening</label>
+                            <input type="text" id="input-account-holder" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
+                        </div>
+                        <hr class="border-softPink/30">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">URL Lagu (.mp3)</label>
+                            <input type="url" id="input-music-url" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
+                        </div>
+
+                        <div class="pt-2 flex gap-2">
+                            <button type="button" onclick="resetAdminSettings()" class="w-1/3 bg-gray-100 text-gray-600 text-xs py-2 rounded-lg font-medium">Reset</button>
+                            <button type="submit" class="w-2/3 bg-darkPink text-white text-xs py-2 rounded-lg font-medium hover:bg-deepRose">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+        <!-- APP BOTTOM NAVIGATION BAR -->
+        <nav class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-white/90 backdrop-blur-md border-t border-softPink/40 py-2.5 px-6 flex justify-around items-center z-30">
+            <button onclick="switchView('home')" id="nav-home" class="nav-btn text-darkPink flex flex-col items-center gap-1">
+                <i class="fa-solid fa-house text-base"></i>
+                <span class="text-[10px] font-medium">Home</span>
+            </button>
+            <button onclick="switchView('acara')" id="nav-acara" class="nav-btn text-gray-400 hover:text-darkPink flex flex-col items-center gap-1">
+                <i class="fa-solid fa-calendar-days text-base"></i>
+                <span class="text-[10px] font-medium">Acara</span>
+            </button>
+            <button onclick="switchView('rsvp')" id="nav-rsvp" class="nav-btn text-gray-400 hover:text-darkPink flex flex-col items-center gap-1">
+                <i class="fa-solid fa-envelope-open-text text-base"></i>
+                <span class="text-[10px] font-medium">RSVP</span>
+            </button>
+            <button onclick="switchView('admin')" id="nav-admin" class="nav-btn text-gray-400 hover:text-darkPink flex flex-col items-center gap-1">
+                <i class="fa-solid fa-user-lock text-base"></i>
+                <span class="text-[10px] font-medium">Admin</span>
+            </button>
+        </nav>
+
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
@@ -404,11 +397,9 @@
             document.querySelectorAll('.display-couple-names').forEach(el => {
                 el.textContent = titlePair;
             });
-            document.title = `Undangan Pernikahan - ${titlePair}`;
 
             document.getElementById('display-bride-name').textContent = currentConfig.brideName;
             document.getElementById('display-groom-name').textContent = currentConfig.groomName;
-
             document.getElementById('display-bank-name').textContent = currentConfig.bankName;
             document.getElementById('display-account-number').textContent = currentConfig.accountNumber;
             document.getElementById('display-account-holder').textContent = currentConfig.accountHolder;
@@ -419,16 +410,14 @@
             }
         }
 
-        function openInvitation() {
+        function openInvitationApp() {
             document.getElementById('cover').classList.add('opened');
             musicBtn.classList.remove('hidden');
-            
+
             bgMusic.play().then(() => {
                 isMusicPlaying = true;
                 musicIcon.className = "fa-solid fa-music animate-spin";
-            }).catch(() => {
-                console.log("Autoplay blocked");
-            });
+            }).catch(() => console.log("Autoplay blocked"));
 
             loadWishes();
         }
@@ -444,113 +433,46 @@
             isMusicPlaying = !isMusicPlaying;
         }
 
-        async function submitRSVP(e) {
-            e.preventDefault();
-            const name = document.getElementById('rsvp-name').value.trim();
-            const presence = document.getElementById('rsvp-presence').value;
-            const message = document.getElementById('rsvp-message').value.trim();
-            const submitBtn = document.getElementById('btn-submit-rsvp');
-
-            if (!name || !message) {
-                alert('Harap isi nama dan ucapan Anda.');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> Mengirim...';
-
-            try {
-                const formData = new URLSearchParams();
-                formData.append('nama', name);
-                formData.append('kehadiran', presence);
-                formData.append('ucapan', message);
-
-                await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData
-                });
-
-                alert('Terima kasih! Ucapan dan konfirmasi Anda telah terkirim.');
-                document.getElementById('rsvp-form').reset();
-                loadWishes();
-            } catch (err) {
-                console.error(err);
-                alert('Terima kasih! Ucapan Anda telah dikirim.');
-                document.getElementById('rsvp-form').reset();
-                loadWishes();
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-paper-plane"></i> Kirim Ucapan';
-            }
-        }
-
-        async function loadWishes() {
-            const container = document.getElementById('wishes-container');
-            try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                
-                if (Array.isArray(data) && data.length > 0) {
-                    container.innerHTML = data.reverse().map(item => `
-                        <div class="bg-lightRose/80 p-3.5 rounded-2xl border border-pastelPink/60 text-left shadow-xs">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="font-semibold text-xs text-gray-800">${escapeHtml(item.nama || item.Name || 'Tamu')}</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded-full ${item.kehadiran === 'Hadir' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}">${escapeHtml(item.kehadiran || 'Hadir')}</span>
-                            </div>
-                            <p class="text-xs text-gray-600 mt-1">${escapeHtml(item.ucapan || item.Message || '')}</p>
-                        </div>
-                    `).join('');
-                } else {
-                    container.innerHTML = '<p class="text-xs text-gray-400 text-center italic">Belum ada ucapan. Jadilah yang pertama!</p>';
-                }
-            } catch(err) {
-                console.log("Error loading wishes:", err);
-                container.innerHTML = '<p class="text-xs text-gray-400 text-center italic">Terima kasih atas doa & restu Anda.</p>';
-            }
-        }
-
-        function copyAccount() {
-            const accNum = currentConfig.accountNumber;
-            navigator.clipboard.writeText(accNum);
-            alert(`Nomor rekening ${currentConfig.bankName} (${accNum}) berhasil disalin!`);
-        }
-
-        function escapeHtml(text) {
-            return String(text).replace(/[&<>"']/g, function(m) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+        // SPA Navigation Switcher
+        function switchView(viewName) {
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('text-darkPink');
+                b.classList.add('text-gray-400');
             });
-        }
 
-        function openAdminModal() {
-            document.getElementById('admin-modal').classList.remove('hidden');
-            if (isAdminLoggedIn) {
-                showAdminPanel();
-            } else {
-                document.getElementById('admin-login-view').classList.remove('hidden');
-                document.getElementById('admin-panel-view').classList.add('hidden');
+            const targetView = document.getElementById(`view-${viewName}`);
+            const targetNav = document.getElementById(`nav-${viewName}`);
+
+            if (targetView) targetView.classList.add('active');
+            if (targetNav) {
+                targetNav.classList.remove('text-gray-400');
+                targetNav.classList.add('text-darkPink');
             }
+
+            // Autoload data on view switch
+            if (viewName === 'rsvp') loadWishes();
+            if (viewName === 'admin' && isAdminLoggedIn) showAdminPanel();
         }
 
-        function closeAdminModal() {
-            document.getElementById('admin-modal').classList.add('hidden');
-        }
-
+        // LOGIN ADMIN FUNCTIONALITY
         function handleAdminLogin(e) {
             e.preventDefault();
-            const passwordInput = document.getElementById('admin-password-input').value;
-            if (passwordInput === 'admin123') {
+            const passcode = document.getElementById('admin-passcode-input').value.trim();
+
+            if (passcode === 'admin123') {
                 isAdminLoggedIn = true;
                 showAdminPanel();
             } else {
-                alert('Kata sandi admin salah! (Default password: admin123)');
+                alert('Passcode Admin Salah!');
             }
         }
 
         function showAdminPanel() {
-            document.getElementById('admin-login-view').classList.add('hidden');
-            document.getElementById('admin-panel-view').classList.remove('hidden');
+            document.getElementById('admin-login-box').classList.add('hidden');
+            document.getElementById('admin-panel-box').classList.remove('hidden');
 
+            // Fill Form Inputs with Current Config Data
             document.getElementById('input-bride-name').value = currentConfig.brideName;
             document.getElementById('input-groom-name').value = currentConfig.groomName;
             document.getElementById('input-bank-name').value = currentConfig.bankName;
@@ -571,25 +493,90 @@
             localStorage.setItem('wedding_config', JSON.stringify(currentConfig));
             applyConfigToDOM();
 
-            alert('Pengaturan berhasil diperbarui!');
-            closeAdminModal();
+            alert('Data Berhasil Diperbarui!');
         }
 
         function resetAdminSettings() {
-            if (confirm('Apakah Anda yakin ingin mengembalikan semua data ke pengaturan awal?')) {
+            if (confirm('Kembalikan semua data ke default?')) {
                 currentConfig = { ...DEFAULT_CONFIG };
                 localStorage.removeItem('wedding_config');
                 applyConfigToDOM();
                 showAdminPanel();
-                alert('Data berhasil di-reset!');
             }
         }
 
         function adminLogout() {
             isAdminLoggedIn = false;
-            document.getElementById('admin-password-input').value = '';
-            document.getElementById('admin-login-view').classList.remove('hidden');
-            document.getElementById('admin-panel-view').classList.add('hidden');
+            document.getElementById('admin-passcode-input').value = '';
+            document.getElementById('admin-login-box').classList.remove('hidden');
+            document.getElementById('admin-panel-box').classList.add('hidden');
+        }
+
+        // RSVP API FETCH
+        async function submitRSVP(e) {
+            e.preventDefault();
+            const name = document.getElementById('rsvp-name').value.trim();
+            const presence = document.getElementById('rsvp-presence').value;
+            const message = document.getElementById('rsvp-message').value.trim();
+            const btn = document.getElementById('btn-submit-rsvp');
+
+            btn.disabled = true;
+            btn.innerHTML = 'Mengirim...';
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('nama', name);
+                formData.append('kehadiran', presence);
+                formData.append('ucapan', message);
+
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                alert('Ucapan berhasil dikirim!');
+                document.getElementById('rsvp-form').reset();
+                loadWishes();
+            } catch (err) {
+                alert('Ucapan berhasil dikirim!');
+                document.getElementById('rsvp-form').reset();
+                loadWishes();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Kirim Ucapan';
+            }
+        }
+
+        async function loadWishes() {
+            const container = document.getElementById('wishes-container');
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    container.innerHTML = data.reverse().map(item => `
+                        <div class="bg-white p-3 rounded-xl border border-softPink/40 text-left">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-xs text-gray-800">${escapeHtml(item.nama || item.Name || 'Tamu')}</span>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full ${item.kehadiran === 'Hadir' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}">${escapeHtml(item.kehadiran || 'Hadir')}</span>
+                            </div>
+                            <p class="text-xs text-gray-600">${escapeHtml(item.ucapan || item.Message || '')}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p class="text-xs text-gray-400 text-center italic">Belum ada ucapan.</p>';
+                }
+            } catch(e) {
+                container.innerHTML = '<p class="text-xs text-gray-400 text-center italic">Terima kasih atas doa & restu Anda.</p>';
+            }
+        }
+
+        function copyAccount() {
+            navigator.clipboard.writeText(currentConfig.accountNumber);
+            alert(`Nomor rekening ${currentConfig.accountNumber} berhasil disalin!`);
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
         }
     </script>
 </body>
