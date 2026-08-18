@@ -1,583 +1,539 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Wedding of Yulia & Anto</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>The Wedding of Yulia & Anto </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #FAF6F0;
+      --card-bg: #FFFFFF;
+      --primary: #D8A7B1;
+      --primary-dark: #B5838D;
+      --accent: #A38288;
+      --text-main: #4A3E3D;
+      --text-light: #7A6F6D;
+      --shadow: 0 8px 30px rgba(216, 167, 177, 0.12);
+      --radius: 18px;
+    }
 
-    <!-- FAVICON PINK PASTEL MANIS -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='30' fill='%23ffcad4'/><path d='M50 80 C20 55 10 38 25 24 C38 12 48 25 50 30 C52 25 62 12 75 24 C90 38 80 55 50 80 Z' fill='%23f4acb7'/><path d='M50 72 C26 50 18 36 30 25 C40 15 48 25 50 29 C52 25 60 15 70 25 C82 36 74 50 50 72 Z' fill='%239e2a2b'/></svg>">
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    #app-container {
+      width: 100%; max-width: 430px; height: 100vh; max-height: 900px; background: var(--bg-color);
+      position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.05);
+    }
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        cursive: ['"Great Vibes"', 'cursive'],
-                        serif: ['"Playfair Display"', 'serif'],
-                        sans: ['"Montserrat"', 'sans-serif'],
-                    },
-                    colors: {
-                        pastelBg: '#FDF8F5',
-                        pastelPink: '#E8C5C8',
-                        softPink: '#F4DCDA',
-                        darkPink: '#A66E74',
-                        accentPink: '#C88A90',
-                        deepRose: '#8C4A51'
-                    }
-                }
-            }
-        }
-    </script>
+    .audio-btn {
+      position: absolute; top: 16px; right: 16px; z-index: 100; background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(8px); border: 1px solid var(--primary); border-radius: 50%; width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--primary-dark);
+    }
 
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f3ece8;
-            color: #4a4a4a;
-            touch-action: manipulation;
-        }
+    .view {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 24px 20px 80px 20px;
+      overflow-y: auto; opacity: 0; pointer-events: none; transform: scale(0.98); transition: all 0.35s ease-in-out;
+      display: flex; flex-direction: column;
+    }
+    .view.active { opacity: 1; pointer-events: auto; transform: scale(1); }
 
-        /* App Frame Layout */
-        .app-container {
-            max-width: 430px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background-color: #FDF8F5;
-            position: relative;
-            box-shadow: 0 0 25px rgba(0,0,0,0.08);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+    .nav-bar {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px); border-top: 1px solid rgba(216, 167, 177, 0.2); display: flex; justify-content: space-around;
+      align-items: center; z-index: 90;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-light); font-size: 10px; cursor: pointer; border: none; background: none; }
+    .nav-item.active { color: var(--primary-dark); font-weight: 600; }
+    .nav-item svg { width: 20px; height: 20px; fill: currentColor; margin-bottom: 2px; }
 
-        /* Views management (SPA) */
-        .app-view {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 80px; /* Space for Bottom Nav */
-        }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px; color: var(--primary-dark); font-size: 13px;
+      font-weight: 500; cursor: pointer; margin-bottom: 16px; border: none; background: none; width: fit-content;
+    }
 
-        .app-view.active {
-            display: block;
-        }
+    h1, h2, h3 { font-family: 'Cormorant Garamond', serif; color: var(--text-main); font-weight: 600; }
+    h1 { font-size: 32px; } h2 { font-size: 26px; margin-bottom: 12px; }
 
-        /* Cover Screen Overlay */
-        .cover-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            max-width: 430px;
-            margin: 0 auto;
-            background: linear-gradient(180deg, #FDF8F5 0%, #F4DCDA 100%);
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid rgba(216, 167, 177, 0.15); }
+    .btn {
+      width: 100%; padding: 12px; border-radius: 12px; border: none; background: var(--primary);
+      color: white; font-weight: 500; font-size: 14px; cursor: pointer; transition: background 0.2s; text-align: center; text-decoration: none; display: block;
+    }
+    .btn:active { background: var(--primary-dark); }
+    .btn-secondary { background: transparent; border: 1px solid var(--primary); color: var(--primary-dark); }
 
-        .cover-overlay.opened {
-            transform: translateY(-100%);
-        }
+    /* Home View */
+    .hero-box { text-align: center; margin-top: 40px; }
+    .subtitle { font-size: 13px; color: var(--text-light); letter-spacing: 2px; text-transform: uppercase; }
+    .couple-name { font-size: 36px; margin: 12px 0; color: var(--primary-dark); line-height: 1.1; }
+    .quote { font-style: italic; font-size: 14px; color: var(--text-light); margin-bottom: 24px; }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #E8C5C8; border-radius: 4px; }
-    </style>
+    .timer-container { display: flex; justify-content: space-around; background: rgba(216, 167, 177, 0.1); border-radius: 14px; padding: 12px; margin: 20px 0; }
+    .timer-box { text-align: center; }
+    .timer-num { font-size: 20px; font-weight: 600; color: var(--primary-dark); }
+    .timer-label { font-size: 10px; color: var(--text-light); }
+
+    .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+    .menu-card { background: var(--card-bg); border-radius: 14px; padding: 14px 8px; text-align: center; box-shadow: var(--shadow); cursor: pointer; border: 1px solid rgba(216, 167, 177, 0.1); }
+    .menu-card svg { width: 24px; height: 24px; fill: var(--primary); margin-bottom: 6px; }
+    .menu-card span { display: block; font-size: 11px; color: var(--text-main); font-weight: 500; }
+
+    /* Forms & Inputs */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; color: var(--text-light); margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #E2D7D9; font-size: 13px; outline: none; }
+    .form-control:focus { border-color: var(--primary); }
+
+    /* Admin Styles */
+    .admin-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: rgba(216, 167, 177, 0.1); padding: 12px; border-radius: 12px; text-align: center; }
+    .stat-num { font-size: 22px; font-weight: 600; color: var(--primary-dark); }
+    .stat-title { font-size: 11px; color: var(--text-light); }
+
+    /* Timeline */
+    .tl-item { position: relative; padding-left: 20px; border-left: 2px solid var(--primary); margin-bottom: 16px; }
+    .tl-item::before { content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--primary); }
+    .tl-date { font-size: 11px; color: var(--primary-dark); font-weight: 600; }
+    .tl-title { font-size: 14px; font-weight: 500; }
+
+    /* Modal */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 200; }
+    .modal-content { background: white; padding: 20px; border-radius: 16px; width: 90%; max-width: 360px; max-height: 80vh; overflow-y: auto; }
+  </style>
 </head>
 <body>
 
-    <!-- AUDIO PLAYER -->
-    <audio id="bg-music" loop>
-        <source id="music-source" src="https://assets.mixkit.co/music/preview/mixkit-romantic-wedding-482.mp3" type="audio/mpeg">
-    </audio>
+<div id="app-container">
+  <button class="audio-btn" id="musicToggle" onclick="toggleMusic()">🎵</button>
+  <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3"></audio>
 
-    <div class="app-container">
-
-        <!-- FLOATING MUSIC BUTTON -->
-        <button id="music-btn" onclick="toggleMusic()" class="fixed top-4 right-4 z-40 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-md text-darkPink border border-softPink hidden">
-            <i id="music-icon" class="fa-solid fa-music"></i>
-        </button>
-
-        <!-- COVER OVERLAY (APP START) -->
-        <div id="cover" class="cover-overlay flex flex-col justify-between p-8 text-center">
-            <div class="pt-8">
-                <span class="text-xs uppercase tracking-widest text-darkPink font-semibold bg-white/60 px-4 py-1.5 rounded-full border border-softPink">The Wedding Of</span>
-                <h1 class="font-cursive text-6xl text-deepRose my-4 display-couple-names">Yulia & Anto</h1>
-                <p class="text-xs text-gray-500 italic max-w-xs mx-auto">Kami mengundang Anda untuk berbagi kebahagiaan di hari pernikahan kami.</p>
-            </div>
-
-            <div class="my-auto">
-                <div class="w-44 h-44 mx-auto rounded-full border-4 border-white shadow-lg overflow-hidden p-1.5 bg-softPink/40">
-                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=400" alt="Mempelai" class="w-full h-full object-cover rounded-full">
-                </div>
-            </div>
-
-            <div class="pb-6">
-                <p class="text-xs text-gray-500 mb-2">Kepada Yth. Bapak/Ibu/Saudara/i</p>
-                <button onclick="openInvitationApp()" class="w-full bg-darkPink hover:bg-deepRose text-white font-medium py-3.5 px-6 rounded-2xl shadow-md transition duration-300 flex items-center justify-center gap-2">
-                    <i class="fa-envelope-open text-sm"></i> Buka Undangan
-                </button>
-            </div>
-        </div>
-
-        <!-- VIEW 1: HOME PAGE -->
-        <div id="view-home" class="app-view active">
-            <header class="p-6 text-center pt-10 bg-gradient-to-b from-softPink/40 to-transparent">
-                <span class="text-[10px] uppercase tracking-widest text-darkPink font-semibold">Walimatul 'Ursy</span>
-                <h2 class="font-cursive text-5xl text-deepRose my-2 display-couple-names">Yulia & Anto</h2>
-                <p class="text-xs font-serif italic text-gray-500">Minggu, 20 September 2026</p>
-            </header>
-
-            <section class="px-6 py-4">
-                <div class="rounded-3xl overflow-hidden shadow-sm border border-softPink/50 mb-6">
-                    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600" alt="Banner" class="w-full h-48 object-cover">
-                </div>
-
-                <div class="text-center bg-white p-5 rounded-2xl shadow-xs border border-softPink/40 mb-6">
-                    <i class="fa-solid fa-quote-left text-2xl text-pastelPink mb-2"></i>
-                    <p class="text-xs text-gray-600 leading-relaxed italic font-serif">
-                        "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri..."
-                    </p>
-                    <p class="text-[10px] font-semibold text-darkPink mt-2 tracking-wider">— QS. Ar-Rum: 21 —</p>
-                </div>
-
-                <div class="space-y-6 text-center">
-                    <h3 class="font-serif text-lg font-bold text-gray-800">Mempelai</h3>
-                    
-                    <div class="bg-white p-4 rounded-2xl border border-softPink/30">
-                        <div class="w-24 h-24 mx-auto rounded-full overflow-hidden mb-3 border-2 border-pastelPink">
-                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300" class="w-full h-full object-cover">
-                        </div>
-                        <h4 id="display-bride-name" class="font-serif text-xl font-bold text-deepRose">Yulia Wijaya, S.Kom</h4>
-                        <p class="text-[11px] text-gray-500">Putri pertama dari Bpk. Wijaya & Ibu Endang</p>
-                    </div>
-
-                    <div class="font-cursive text-3xl text-pastelPink">&</div>
-
-                    <div class="bg-white p-4 rounded-2xl border border-softPink/30">
-                        <div class="w-24 h-24 mx-auto rounded-full overflow-hidden mb-3 border-2 border-pastelPink">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300" class="w-full h-full object-cover">
-                        </div>
-                        <h4 id="display-groom-name" class="font-serif text-xl font-bold text-deepRose">Anto Prasetyo, S.T</h4>
-                        <p class="text-[11px] text-gray-500">Putra bungsu dari Bpk. Prasetyo & Ibu Sumarni</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- VIEW 2: ACARA PAGE -->
-        <div id="view-acara" class="app-view">
-            <header class="p-6 text-center pt-8">
-                <h2 class="font-serif text-2xl font-bold text-gray-800">Rangkaian Acara</h2>
-                <p class="text-xs text-gray-500">Waktu & Lokasi Pernikahan</p>
-            </header>
-
-            <section class="px-6 space-y-4">
-                <div class="bg-white p-5 rounded-2xl shadow-xs border border-softPink/50 text-center">
-                    <div class="w-10 h-10 mx-auto bg-softPink/50 text-darkPink rounded-full flex items-center justify-center text-lg mb-2">
-                        <i class="fa-solid fa-ring"></i>
-                    </div>
-                    <h3 class="font-serif text-lg font-bold text-gray-800">Akad Nikah</h3>
-                    <p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-calendar-check mr-1 text-darkPink"></i> Minggu, 20 September 2026</p>
-                    <p class="text-xs text-gray-600 font-medium mt-0.5"><i class="fa-regular fa-clock mr-1 text-darkPink"></i> 08.00 WIB - Selesai</p>
-                    <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-location-dot mr-1 text-darkPink"></i> Gedung Serbaguna Utama, Wonosobo</p>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl shadow-xs border border-softPink/50 text-center">
-                    <div class="w-10 h-10 mx-auto bg-softPink/50 text-darkPink rounded-full flex items-center justify-center text-lg mb-2">
-                        <i class="fa-solid fa-champagne-glasses"></i>
-                    </div>
-                    <h3 class="font-serif text-lg font-bold text-gray-800">Resepsi</h3>
-                    <p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-calendar-check mr-1 text-darkPink"></i> Minggu, 20 September 2026</p>
-                    <p class="text-xs text-gray-600 font-medium mt-0.5"><i class="fa-regular fa-clock mr-1 text-darkPink"></i> 11.00 - 14.00 WIB</p>
-                    <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-location-dot mr-1 text-darkPink"></i> Gedung Serbaguna Utama, Wonosobo</p>
-                </div>
-
-                <div class="pt-2 text-center">
-                    <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-2 bg-darkPink text-white text-xs font-medium py-3 px-6 rounded-xl shadow-xs hover:bg-deepRose transition">
-                        <i class="fa-solid fa-map-location-dot"></i> Buka Peta Lokasi
-                    </a>
-                </div>
-
-                <!-- AMPLOP DIGITAL -->
-                <div class="mt-8 pt-6 border-t border-softPink/40 text-center">
-                    <h3 class="font-serif text-lg font-bold text-gray-800 mb-1">Amplop Digital</h3>
-                    <p class="text-[11px] text-gray-500 mb-4">Transfer kado pernikahan secara langsung:</p>
-                    
-                    <div class="bg-white p-4 rounded-2xl border border-softPink/50 max-w-xs mx-auto">
-                        <p id="display-bank-name" class="font-bold text-gray-800 text-xs">BANK BCA</p>
-                        <p id="display-account-number" class="text-base font-bold text-darkPink my-1">1234567890</p>
-                        <p id="display-account-holder" class="text-[11px] text-gray-500 mb-3">a.n. Yulia Wijaya</p>
-                        <button onclick="copyAccount()" class="bg-softPink/60 hover:bg-softPink text-darkPink text-[11px] font-semibold py-1.5 px-4 rounded-full transition">
-                            <i class="fa-regular fa-copy mr-1"></i> Salin Rekening
-                        </button>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- VIEW 3: RSVP PAGE -->
-        <div id="view-rsvp" class="app-view">
-            <header class="p-6 text-center pt-8">
-                <h2 class="font-serif text-2xl font-bold text-gray-800">RSVP & Ucapan</h2>
-                <p class="text-xs text-gray-500">Konfirmasi Kehadiran & Doa Restu</p>
-            </header>
-
-            <section class="px-6">
-                <form id="rsvp-form" onsubmit="submitRSVP(event)" class="space-y-3 bg-white p-5 rounded-2xl border border-softPink/50 shadow-xs mb-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama</label>
-                        <input type="text" id="rsvp-name" required placeholder="Nama Anda" class="w-full px-3 py-2 rounded-xl border border-softPink text-xs focus:ring-1 focus:ring-darkPink focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Kehadiran</label>
-                        <select id="rsvp-presence" class="w-full px-3 py-2 rounded-xl border border-softPink text-xs focus:ring-1 focus:ring-darkPink focus:outline-none bg-white">
-                            <option value="Hadir">Hadir</option>
-                            <option value="Tidak Hadir">Tidak Hadir</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Ucapan / Doa</label>
-                        <textarea id="rsvp-message" rows="3" required placeholder="Tulis ucapan selamat..." class="w-full px-3 py-2 rounded-xl border border-softPink text-xs focus:ring-1 focus:ring-darkPink focus:outline-none"></textarea>
-                    </div>
-                    <button type="submit" id="btn-submit-rsvp" class="w-full bg-darkPink text-white text-xs font-medium py-2.5 rounded-xl hover:bg-deepRose transition">
-                        Kirim Ucapan
-                    </button>
-                </form>
-
-                <div class="space-y-3">
-                    <h3 class="font-serif text-sm font-bold text-gray-800">Ucapan Doa Restu</h3>
-                    <div id="wishes-container" class="space-y-2.5 max-h-60 overflow-y-auto">
-                        <p class="text-xs text-gray-400 text-center italic">Memuat ucapan...</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- VIEW 4: ADMIN DASHBOARD (LENGKAP WITH LOGIN) -->
-        <div id="view-admin" class="app-view">
-            <header class="p-6 text-center pt-8 relative">
-                <button onclick="switchView('home')" class="absolute top-8 left-6 text-xs text-gray-500 flex items-center gap-1">
-                    <i class="fa-solid fa-arrow-left"></i> Kembali
-                </button>
-                <h2 class="font-serif text-2xl font-bold text-gray-800">Admin Dashboard</h2>
-                <p class="text-xs text-gray-500">Kelola Data & Pengaturan Website</p>
-            </header>
-
-            <section class="px-6">
-                <!-- FORM LOGIN ADMIN -->
-                <div id="admin-login-box" class="bg-white p-6 rounded-2xl border border-softPink/60 shadow-xs text-center">
-                    <i class="fa-solid fa-lock text-3xl text-darkPink mb-3 block"></i>
-                    <p class="text-xs font-semibold text-gray-700 mb-4">Masukkan Passcode Admin untuk masuk</p>
-                    
-                    <form onsubmit="handleAdminLogin(event)" class="space-y-3">
-                        <input type="password" id="admin-passcode-input" placeholder="Passcode (Default: admin123)" required class="w-full px-3 py-2.5 text-center rounded-xl border border-softPink text-xs focus:ring-1 focus:ring-darkPink focus:outline-none">
-                        <button type="submit" class="w-full bg-darkPink text-white text-xs font-medium py-2.5 rounded-xl hover:bg-deepRose transition">
-                            Login Admin
-                        </button>
-                    </form>
-                </div>
-
-                <!-- PANEL EDIT SETTINGS (TERBUKA SETELAH PASSCODE BENAR) -->
-                <div id="admin-panel-box" class="hidden bg-white p-5 rounded-2xl border border-softPink/60 shadow-xs space-y-4">
-                    <div class="flex justify-between items-center pb-2 border-b border-softPink/40">
-                        <span class="text-xs font-bold text-darkPink"><i class="fa-solid fa-sliders mr-1"></i> Edit Informasi Undangan</span>
-                        <button onclick="adminLogout()" class="text-[10px] text-red-500 font-semibold hover:underline">Logout</button>
-                    </div>
-
-                    <form onsubmit="saveAdminSettings(event)" class="space-y-3">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Mempelai Wanita</label>
-                            <input type="text" id="input-bride-name" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Mempelai Pria</label>
-                            <input type="text" id="input-groom-name" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
-                        </div>
-                        <hr class="border-softPink/30">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Bank</label>
-                            <input type="text" id="input-bank-name" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nomor Rekening</label>
-                            <input type="text" id="input-account-number" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Atas Nama Rekening</label>
-                            <input type="text" id="input-account-holder" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
-                        </div>
-                        <hr class="border-softPink/30">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-600 mb-0.5">URL Lagu (.mp3)</label>
-                            <input type="url" id="input-music-url" required class="w-full px-3 py-1.5 rounded-lg border border-softPink text-xs">
-                        </div>
-
-                        <div class="pt-2 flex gap-2">
-                            <button type="button" onclick="resetAdminSettings()" class="w-1/3 bg-gray-100 text-gray-600 text-xs py-2 rounded-lg font-medium">Reset</button>
-                            <button type="submit" class="w-2/3 bg-darkPink text-white text-xs py-2 rounded-lg font-medium hover:bg-deepRose">Simpan Perubahan</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
-        </div>
-
-        <!-- APP BOTTOM NAVIGATION BAR -->
-        <nav class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-white/90 backdrop-blur-md border-t border-softPink/40 py-2.5 px-6 flex justify-around items-center z-30">
-            <button onclick="switchView('home')" id="nav-home" class="nav-btn text-darkPink flex flex-col items-center gap-1">
-                <i class="fa-solid fa-house text-base"></i>
-                <span class="text-[10px] font-medium">Home</span>
-            </button>
-            <button onclick="switchView('acara')" id="nav-acara" class="nav-btn text-gray-400 hover:text-darkPink flex flex-col items-center gap-1">
-                <i class="fa-solid fa-calendar-days text-base"></i>
-                <span class="text-[10px] font-medium">Acara</span>
-            </button>
-            <button onclick="switchView('rsvp')" id="nav-rsvp" class="nav-btn text-gray-400 hover:text-darkPink flex flex-col items-center gap-1">
-                <i class="fa-solid fa-envelope-open-text text-base"></i>
-                <span class="text-[10px] font-medium">RSVP</span>
-            </button>
-            <button onclick="switchView('admin')" id="nav-admin" class="nav-btn text-gray-400 hover:text-darkPink flex flex-col items-center gap-1">
-                <i class="fa-solid fa-user-lock text-base"></i>
-                <span class="text-[10px] font-medium">Admin</span>
-            </button>
-        </nav>
-
+  <!-- HOME VIEW -->
+  <div id="view-home" class="view active">
+    <div class="hero-box">
+      <p class="subtitle">WEDDING INVITATION</p>
+      <h1 class="couple-name">Mempelai W<br>& Mempelai P</h1>
+      <p class="quote">“Two souls, one beautiful journey.”</p>
+      <p id="guestGreeting" style="font-size: 13px; color: var(--primary-dark); font-weight: 500;"></p>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzyV3K_kD5w9OXYawAr-1uV_1Uy1_ElY3C9a55K4TEwNIZdfVLsffLmCYa1lopByYSoVg/exec";
+    <div class="timer-container">
+      <div class="timer-box"><div class="timer-num" id="d">-</div><div class="timer-label">Hari</div></div>
+      <div class="timer-box"><div class="timer-num" id="h">-</div><div class="timer-label">Jam</div></div>
+      <div class="timer-box"><div class="timer-num" id="m">-</div><div class="timer-label">Menit</div></div>
+      <div class="timer-box"><div class="timer-num" id="s">-</div><div class="timer-label">Detik</div></div>
+    </div>
 
-        const DEFAULT_CONFIG = {
-            brideName: "Yulia Wijaya, S.Kom",
-            groomName: "Anto Prasetyo, S.T",
-            bankName: "BANK BCA",
-            accountNumber: "1234567890",
-            accountHolder: "a.n. Yulia Wijaya",
-            musicUrl: "https://assets.mixkit.co/music/preview/mixkit-romantic-wedding-482.mp3"
-        };
+    <div class="menu-grid">
+      <div class="menu-card" onclick="navTo('story')">📖 <span>Story</span></div>
+      <div class="menu-card" onclick="navTo('event')">📅 <span>Acara</span></div>
+      <div class="menu-card" onclick="navTo('location')">📍 <span>Lokasi</span></div>
+      <div class="menu-card" onclick="navTo('rsvp')">💌 <span>RSVP</span></div>
+      <div class="menu-card" onclick="navTo('guestbook')">💬 <span>Ucapan</span></div>
+      <div class="menu-card" onclick="navTo('gallery')">🖼️ <span>Galeri</span></div>
+      <div class="menu-card" onclick="navTo('gift')">🎁 <span>Hadiah</span></div>
+      <div class="menu-card" onclick="navTo('info')">ℹ️ <span>Info</span></div>
+      <div class="menu-card" onclick="navTo('admin')">🔒 <span>Admin</span></div>
+    </div>
+  </div>
 
-        let currentConfig = { ...DEFAULT_CONFIG };
-        let isMusicPlaying = false;
-        let isAdminLoggedIn = false;
+  <!-- STORY VIEW -->
+  <div id="view-story" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Perjalanan Kami</h2>
+    <div class="card">
+      <div class="tl-item"><div class="tl-date">Januari 2022</div><div class="tl-title">Pertama Bertemu</div><p style="font-size: 12px; color: var(--text-light);">Bertemu di kampus dalam sebuah proyek bersama.</p></div>
+      <div class="tl-item"><div class="tl-date">Maret 2023</div><div class="tl-title">Kencan Pertama</div><p style="font-size: 12px; color: var(--text-light);">Menikmati kopi sore dan memulai cerita bersama.</p></div>
+      <div class="tl-item"><div class="tl-date">Desember 2025</div><div class="tl-title">Lamaran</div><p style="font-size: 12px; color: var(--text-light);">Mengingat komitmen untuk melangkah ke jenjang yang lebih serius.</p></div>
+    </div>
+  </div>
 
-        const bgMusic = document.getElementById('bg-music');
-        const musicSource = document.getElementById('music-source');
-        const musicIcon = document.getElementById('music-icon');
-        const musicBtn = document.getElementById('music-btn');
+  <!-- EVENT VIEW -->
+  <div id="view-event" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Rangkaian Acara</h2>
+    <div class="card">
+      <h3>Akad Nikah</h3>
+      <p style="font-size: 13px; margin: 6px 0;">Minggu, 20 September 2026</p>
+      <p style="font-size: 12px; color: var(--text-light);">08:00 - 10:00 WIB</p>
+      <p style="font-size: 12px; color: var(--text-light);">Gedung Mawar, Jakarta</p>
+      <a href="https://calendar.google.com" target="_blank" class="btn btn-secondary" style="margin-top: 12px;">+ Google Calendar</a>
+    </div>
+    <div class="card">
+      <h3>Resepsi</h3>
+      <p style="font-size: 13px; margin: 6px 0;">Minggu, 20 September 2026</p>
+      <p style="font-size: 12px; color: var(--text-light);">11:00 - 14:00 WIB</p>
+      <p style="font-size: 12px; color: var(--text-light);">Gedung Mawar, Jakarta</p>
+    </div>
+  </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadConfigFromStorage();
-            applyConfigToDOM();
+  <!-- LOCATION VIEW -->
+  <div id="view-location" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Lokasi Acara</h2>
+    <div class="card">
+      <h3>Gedung Mawar</h3>
+      <p style="font-size: 12px; color: var(--text-light); margin-bottom: 12px;">Jl. Melati No. 123, Jakarta Selatan</p>
+      <iframe src="https://maps.google.com/maps?q=Jakarta&t=&z=13&ie=UTF8&iwloc=&output=embed" width="100%" height="180" style="border:0; border-radius:10px;" allowfullscreen="" loading="lazy"></iframe>
+      <a href="https://maps.google.com" target="_blank" class="btn" style="margin-top: 12px;">Buka Google Maps</a>
+    </div>
+  </div>
+
+  <!-- RSVP VIEW -->
+  <div id="view-rsvp" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Konfirmasi Kehadiran</h2>
+    <div class="card">
+      <form id="rsvpForm" onsubmit="submitRSVP(event)">
+        <div class="form-group">
+          <label>Nama Tamu</label>
+          <input type="text" id="rsvpName" class="form-control" required readonly>
+        </div>
+        <div class="form-group">
+          <label>Nomor WhatsApp</label>
+          <input type="text" id="rsvpPhone" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Konfirmasi Kehadiran</label>
+          <select id="rsvpStatus" class="form-control">
+            <option value="Hadir">Hadir</option>
+            <option value="Tidak Hadir">Tidak Hadir</option>
+            <option value="Ragu-ragu">Ragu-ragu</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Jumlah Tamu Hadir</label>
+          <select id="rsvpCount" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label>Catatan / Kebutuhan Khusus (Opsional)</label>
+          <textarea id="rsvpNotes" class="form-control" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn">Kirim Konfirmasi</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- GUESTBOOK VIEW -->
+  <div id="view-guestbook" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Buku Tamu & Ucapan</h2>
+    <div class="card">
+      <form onsubmit="submitWish(event)">
+        <div class="form-group">
+          <input type="text" id="wishName" placeholder="Nama Anda" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <textarea id="wishMessage" placeholder="Tuliskan ucapan & doa..." class="form-control" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn">Kirim Ucapan</button>
+      </form>
+    </div>
+    <div id="wishesList"></div>
+  </div>
+
+  <!-- GALLERY VIEW -->
+  <div id="view-gallery" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Galeri Foto</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=400" style="width:100%; border-radius:12px;">
+      <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400" style="width:100%; border-radius:12px;">
+    </div>
+  </div>
+
+  <!-- GIFT VIEW -->
+  <div id="view-gift" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Digital Gift</h2>
+    <div class="card">
+      <h3>Bank BCA</h3>
+      <p style="font-size: 12px; color: var(--text-light);">a.n. Mempelai Wanita</p>
+      <p style="font-weight:600; margin: 8px 0;" id="accBca">1234567890</p>
+      <button class="btn btn-secondary" onclick="copyText('accBca')">Salin Rekening</button>
+    </div>
+  </div>
+
+  <!-- INFO VIEW -->
+  <div id="view-info" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Informasi Acara</h2>
+    <div class="card">
+      <h3>Dress Code</h3>
+      <p style="font-size: 12px; color: var(--text-light);">Pastel / Neutral Colors</p>
+    </div>
+  </div>
+
+  <!-- ADMIN VIEW -->
+  <div id="view-admin" class="view">
+    <button class="back-btn" onclick="navTo('home')">← Kembali</button>
+    <h2>Admin Dashboard</h2>
+    <div id="adminAuth">
+      <div class="card">
+        <div class="form-group">
+          <label>Passcode Admin</label>
+          <input type="password" id="adminPass" class="form-control">
+        </div>
+        <button class="btn" onclick="loadAdminData()">Login Admin</button>
+      </div>
+    </div>
+    <div id="adminContent" style="display: none;">
+      <div class="admin-stat-grid">
+        <div class="stat-card"><div class="stat-num" id="stTotal">0</div><div class="stat-title">Undangan</div></div>
+        <div class="stat-card"><div class="stat-num" id="stAttending">0</div><div class="stat-title">Hadir</div></div>
+        <div class="stat-card"><div class="stat-num" id="stAbsent">0</div><div class="stat-title">Tdk Hadir</div></div>
+        <div class="stat-card"><div class="stat-num" id="stPeople">0</div><div class="stat-title">Total Orang</div></div>
+      </div>
+      <button class="btn btn-secondary" style="margin-bottom:12px;" onclick="openAddGuestModal()">+ Tambah Tamu Baru</button>
+      <h3>Daftar Tamu (Klik untuk Edit)</h3>
+      <div id="adminGuestList"></div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BAR -->
+  <div class="nav-bar">
+    <button class="nav-item active" onclick="navTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
+    </button>
+    <button class="nav-item" onclick="navTo('event')">
+      <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+      Acara
+    </button>
+    <button class="nav-item" onclick="navTo('rsvp')">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      RSVP
+    </button>
+  </div>
+</div>
+
+<!-- MODAL EDIT/TAMBAH TAMU -->
+<div id="guestModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Edit Data Tamu</h3>
+    <form onsubmit="saveGuestAdmin(event)">
+      <input type="hidden" id="editGuestId">
+      <div class="form-group"><label>Nama</label><input type="text" id="editName" class="form-control" required></div>
+      <div class="form-group"><label>WhatsApp</label><input type="text" id="editPhone" class="form-control"></div>
+      <div class="form-group"><label>Kategori</label><input type="text" id="editCategory" class="form-control"></div>
+      <div class="form-group"><label>Max Undangan</label><input type="number" id="editMax" class="form-control" required></div>
+      <div class="form-group"><label>Status Kehadiran</label>
+        <select id="editStatus" class="form-control">
+          <option value="Belum Konfirmasi">Belum Konfirmasi</option>
+          <option value="Hadir">Hadir</option>
+          <option value="Tidak Hadir">Tidak Hadir</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Jumlah Hadir</label><input type="number" id="editCount" class="form-control"></div>
+      <div class="form-group"><label>Catatan</label><input type="text" id="editNotes" class="form-control"></div>
+      <button type="submit" class="btn">Simpan Data</button>
+      <button type="button" class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal()">Batal</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // GANTI SCRIPT_URL DI BAWAH INI DENGAN URL GOOGLE APPS SCRIPT ANDA
+  const API_URL = "https://script.google.com/macros/s/AKfycbzyV3K_kD5w9OXYawAr-1uV_lUyl_ElY3C9a55K4TEwNIZdfVLsffLmCYal1opByYSoVg/exec";
+  
+  let currentGuest = { guestId: "", name: "Tamu Undangan", maxGuests: 2 };
+  let isEditMode = false;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const guestId = params.get('guest');
+    if (guestId) {
+      fetch(`${API_URL}?action=getGuest&guestId=${guestId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.name) {
+            currentGuest = data;
+            document.getElementById('guestGreeting').innerText = `Kepada Yth. ${data.name}`;
+            document.getElementById('rsvpName').value = data.name;
+            document.getElementById('rsvpPhone').value = data.phone || "";
+            setupRsvpCount(data.maxGuests);
+          }
         });
+    } else {
+      setupRsvpCount(2);
+    }
+    startTimer();
+    loadWishes();
+  });
 
-        function loadConfigFromStorage() {
-            const saved = localStorage.getItem('wedding_config');
-            if (saved) {
-                try {
-                    currentConfig = { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
-                } catch (e) {
-                    console.error("Failed to parse config:", e);
-                }
-            }
+  function navTo(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${viewId}`).classList.add('active');
+  }
+
+  function setupRsvpCount(max) {
+    const select = document.getElementById('rsvpCount');
+    select.innerHTML = '';
+    for (let i = 1; i <= max; i++) {
+      select.innerHTML += `<option value="${i}">${i} Orang</option>`;
+    }
+  }
+
+  function startTimer() {
+    const target = new Date('2026-09-20T08:00:00').getTime();
+    setInterval(() => {
+      const now = new Date().getTime();
+      const diff = target - now;
+      if (diff > 0) {
+        document.getElementById('d').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+        document.getElementById('h').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById('m').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('s').innerText = Math.floor((diff % (1000 * 60)) / 1000);
+      }
+    }, 1000);
+  }
+
+  function submitRSVP(e) {
+    e.preventDefault();
+    const payload = {
+      action: "submitRSVP",
+      data: {
+        guestId: currentGuest.guestId || "ANONYMOUS",
+        name: document.getElementById('rsvpName').value,
+        phone: document.getElementById('rsvpPhone').value,
+        status: document.getElementById('rsvpStatus').value,
+        attendingCount: document.getElementById('rsvpCount').value,
+        notes: document.getElementById('rsvpNotes').value
+      }
+    };
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .then(res => res.json())
+      .then(() => alert("Terima kasih atas konfirmasinya. Kami sangat menantikan kehadiran Anda."));
+  }
+
+  function submitWish(e) {
+    e.preventDefault();
+    const name = document.getElementById('wishName').value;
+    const msg = document.getElementById('wishMessage').value;
+    const payload = { action: "submitWish", data: { name: name, message: msg } };
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .then(res => res.json())
+      .then(() => {
+        document.getElementById('wishMessage').value = '';
+        loadWishes();
+      });
+  }
+
+  function loadWishes() {
+    fetch(`${API_URL}?action=getWishes`)
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('wishesList');
+        container.innerHTML = '';
+        if (data.wishes) {
+          data.wishes.forEach(w => {
+            container.innerHTML += `
+              <div class="card" style="padding:12px; margin-bottom:8px;">
+                <p style="font-size:12px; font-weight:600; color:var(--primary-dark);">${w.name}</p>
+                <p style="font-size:12px; color:var(--text-main); margin-top:4px;">${w.message}</p>
+              </div>`;
+          });
         }
+      });
+  }
 
-        function applyConfigToDOM() {
-            const shortBride = currentConfig.brideName.split(',')[0].trim();
-            const shortGroom = currentConfig.groomName.split(',')[0].trim();
-            const titlePair = `${shortBride} & ${shortGroom}`;
+  function loadAdminData() {
+    const pass = document.getElementById('adminPass').value;
+    fetch(`${API_URL}?action=getAdminData&passcode=${pass}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) { alert("Passcode Salah!"); return; }
+        document.getElementById('adminAuth').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
 
-            document.querySelectorAll('.display-couple-names').forEach(el => {
-                el.textContent = titlePair;
-            });
+        document.getElementById('stTotal').innerText = data.summary.totalGuests;
+        document.getElementById('stAttending').innerText = data.summary.totalAttending;
+        document.getElementById('stAbsent').innerText = data.summary.totalAbsent;
+        document.getElementById('stPeople').innerText = data.summary.totalPeopleAttending;
 
-            document.getElementById('display-bride-name').textContent = currentConfig.brideName;
-            document.getElementById('display-groom-name').textContent = currentConfig.groomName;
-            document.getElementById('display-bank-name').textContent = currentConfig.bankName;
-            document.getElementById('display-account-number').textContent = currentConfig.accountNumber;
-            document.getElementById('display-account-holder').textContent = currentConfig.accountHolder;
+        const list = document.getElementById('adminGuestList');
+        list.innerHTML = '';
+        data.guests.forEach(g => {
+          list.innerHTML += `
+            <div class="card" style="padding:12px; margin-bottom:8px; cursor:pointer;" onclick='openEditModal(${JSON.stringify(g)})'>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>${g.name} (${g.guestId})</strong>
+                <span style="font-size:11px; padding:2px 6px; border-radius:6px; background:#eee;">${g.status}</span>
+              </div>
+              <p style="font-size:11px; color:var(--text-light); margin-top:4px;">Undangan: ${g.maxGuests} | Hadir: ${g.attendingCount}</p>
+            </div>`;
+        });
+      });
+  }
 
-            if (musicSource.src !== currentConfig.musicUrl) {
-                musicSource.src = currentConfig.musicUrl;
-                bgMusic.load();
-            }
-        }
+  function openEditModal(g) {
+    isEditMode = true;
+    document.getElementById('modalTitle').innerText = "Edit Data Tamu";
+    document.getElementById('editGuestId').value = g.guestId;
+    document.getElementById('editName').value = g.name;
+    document.getElementById('editPhone').value = g.phone;
+    document.getElementById('editCategory').value = g.category;
+    document.getElementById('editMax').value = g.maxGuests;
+    document.getElementById('editStatus').value = g.status;
+    document.getElementById('editCount').value = g.attendingCount;
+    document.getElementById('editNotes').value = g.notes;
+    document.getElementById('guestModal').style.display = 'flex';
+  }
 
-        function openInvitationApp() {
-            document.getElementById('cover').classList.add('opened');
-            musicBtn.classList.remove('hidden');
+  function openAddGuestModal() {
+    isEditMode = false;
+    document.getElementById('modalTitle').innerText = "Tambah Tamu Baru";
+    document.getElementById('editGuestId').value = "G" + Math.floor(100 + Math.random() * 900);
+    document.getElementById('editName').value = "";
+    document.getElementById('editPhone').value = "";
+    document.getElementById('editCategory').value = "Umum";
+    document.getElementById('editMax').value = 2;
+    document.getElementById('editStatus').value = "Belum Konfirmasi";
+    document.getElementById('editCount').value = 0;
+    document.getElementById('editNotes').value = "";
+    document.getElementById('guestModal').style.display = 'flex';
+  }
 
-            bgMusic.play().then(() => {
-                isMusicPlaying = true;
-                musicIcon.className = "fa-solid fa-music animate-spin";
-            }).catch(() => console.log("Autoplay blocked"));
+  function closeModal() { document.getElementById('guestModal').style.display = 'none'; }
 
-            loadWishes();
-        }
+  function saveGuestAdmin(e) {
+    e.preventDefault();
+    const pass = document.getElementById('adminPass').value;
+    const payload = {
+      action: isEditMode ? "adminUpdateGuest" : "adminAddGuest",
+      passcode: pass,
+      data: {
+        guestId: document.getElementById('editGuestId').value,
+        name: document.getElementById('editName').value,
+        phone: document.getElementById('editPhone').value,
+        category: document.getElementById('editCategory').value,
+        maxGuests: document.getElementById('editMax').value,
+        status: document.getElementById('editStatus').value,
+        attendingCount: document.getElementById('editCount').value,
+        notes: document.getElementById('editNotes').value
+      }
+    };
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .then(res => res.json())
+      .then(() => {
+        closeModal();
+        loadAdminData();
+      });
+  }
 
-        function toggleMusic() {
-            if (isMusicPlaying) {
-                bgMusic.pause();
-                musicIcon.className = "fa-solid fa-volume-xmark";
-            } else {
-                bgMusic.play();
-                musicIcon.className = "fa-solid fa-music animate-spin";
-            }
-            isMusicPlaying = !isMusicPlaying;
-        }
+  function copyText(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text);
+    alert("Copied!");
+  }
 
-        // SPA Navigation Switcher
-        function switchView(viewName) {
-            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('text-darkPink');
-                b.classList.add('text-gray-400');
-            });
-
-            const targetView = document.getElementById(`view-${viewName}`);
-            const targetNav = document.getElementById(`nav-${viewName}`);
-
-            if (targetView) targetView.classList.add('active');
-            if (targetNav) {
-                targetNav.classList.remove('text-gray-400');
-                targetNav.classList.add('text-darkPink');
-            }
-
-            // Autoload data on view switch
-            if (viewName === 'rsvp') loadWishes();
-            if (viewName === 'admin' && isAdminLoggedIn) showAdminPanel();
-        }
-
-        // LOGIN ADMIN FUNCTIONALITY
-        function handleAdminLogin(e) {
-            e.preventDefault();
-            const passcode = document.getElementById('admin-passcode-input').value.trim();
-
-            if (passcode === 'admin123') {
-                isAdminLoggedIn = true;
-                showAdminPanel();
-            } else {
-                alert('Passcode Admin Salah!');
-            }
-        }
-
-        function showAdminPanel() {
-            document.getElementById('admin-login-box').classList.add('hidden');
-            document.getElementById('admin-panel-box').classList.remove('hidden');
-
-            // Fill Form Inputs with Current Config Data
-            document.getElementById('input-bride-name').value = currentConfig.brideName;
-            document.getElementById('input-groom-name').value = currentConfig.groomName;
-            document.getElementById('input-bank-name').value = currentConfig.bankName;
-            document.getElementById('input-account-number').value = currentConfig.accountNumber;
-            document.getElementById('input-account-holder').value = currentConfig.accountHolder;
-            document.getElementById('input-music-url').value = currentConfig.musicUrl;
-        }
-
-        function saveAdminSettings(e) {
-            e.preventDefault();
-            currentConfig.brideName = document.getElementById('input-bride-name').value.trim();
-            currentConfig.groomName = document.getElementById('input-groom-name').value.trim();
-            currentConfig.bankName = document.getElementById('input-bank-name').value.trim();
-            currentConfig.accountNumber = document.getElementById('input-account-number').value.trim();
-            currentConfig.accountHolder = document.getElementById('input-account-holder').value.trim();
-            currentConfig.musicUrl = document.getElementById('input-music-url').value.trim();
-
-            localStorage.setItem('wedding_config', JSON.stringify(currentConfig));
-            applyConfigToDOM();
-
-            alert('Data Berhasil Diperbarui!');
-        }
-
-        function resetAdminSettings() {
-            if (confirm('Kembalikan semua data ke default?')) {
-                currentConfig = { ...DEFAULT_CONFIG };
-                localStorage.removeItem('wedding_config');
-                applyConfigToDOM();
-                showAdminPanel();
-            }
-        }
-
-        function adminLogout() {
-            isAdminLoggedIn = false;
-            document.getElementById('admin-passcode-input').value = '';
-            document.getElementById('admin-login-box').classList.remove('hidden');
-            document.getElementById('admin-panel-box').classList.add('hidden');
-        }
-
-        // RSVP API FETCH
-        async function submitRSVP(e) {
-            e.preventDefault();
-            const name = document.getElementById('rsvp-name').value.trim();
-            const presence = document.getElementById('rsvp-presence').value;
-            const message = document.getElementById('rsvp-message').value.trim();
-            const btn = document.getElementById('btn-submit-rsvp');
-
-            btn.disabled = true;
-            btn.innerHTML = 'Mengirim...';
-
-            try {
-                const formData = new URLSearchParams();
-                formData.append('nama', name);
-                formData.append('kehadiran', presence);
-                formData.append('ucapan', message);
-
-                await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData
-                });
-                alert('Ucapan berhasil dikirim!');
-                document.getElementById('rsvp-form').reset();
-                loadWishes();
-            } catch (err) {
-                alert('Ucapan berhasil dikirim!');
-                document.getElementById('rsvp-form').reset();
-                loadWishes();
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'Kirim Ucapan';
-            }
-        }
-
-        async function loadWishes() {
-            const container = document.getElementById('wishes-container');
-            try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    container.innerHTML = data.reverse().map(item => `
-                        <div class="bg-white p-3 rounded-xl border border-softPink/40 text-left">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="font-bold text-xs text-gray-800">${escapeHtml(item.nama || item.Name || 'Tamu')}</span>
-                                <span class="text-[9px] px-2 py-0.5 rounded-full ${item.kehadiran === 'Hadir' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}">${escapeHtml(item.kehadiran || 'Hadir')}</span>
-                            </div>
-                            <p class="text-xs text-gray-600">${escapeHtml(item.ucapan || item.Message || '')}</p>
-                        </div>
-                    `).join('');
-                } else {
-                    container.innerHTML = '<p class="text-xs text-gray-400 text-center italic">Belum ada ucapan.</p>';
-                }
-            } catch(e) {
-                container.innerHTML = '<p class="text-xs text-gray-400 text-center italic">Terima kasih atas doa & restu Anda.</p>';
-            }
-        }
-
-        function copyAccount() {
-            navigator.clipboard.writeText(currentConfig.accountNumber);
-            alert(`Nomor rekening ${currentConfig.accountNumber} berhasil disalin!`);
-        }
-
-        function escapeHtml(str) {
-            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
-        }
-    </script>
+  function toggleMusic() {
+    const audio = document.getElementById('bgMusic');
+    if (audio.paused) { audio.play(); } else { audio.pause(); }
+  }
+</script>
 </body>
 </html>
